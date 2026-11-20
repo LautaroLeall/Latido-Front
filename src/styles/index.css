@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  /* Foco visible de teclado coherente con la estética a guillotina */
+  :focus-visible {
+    outline: 2px solid #1F6F64;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+
+  /* Perforación de ticket térmico */
+  .perf-edge {
+    height: 12px;
+    background-image: radial-gradient(circle, #1A1D29 2px, transparent 2.4px);
+    background-size: 16px 12px;
+    background-repeat: repeat-x;
+    background-position: center;
+  }
+
+  /* Sello de goma rotado (Stamp) */
+  .stamp {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-width: 1.5px;
+    border-style: solid;
+    transform: rotate(-2deg);
+    white-space: nowrap;
+  }
+
+  .stamp-teal {
+    color: #1F6F64;
+    border-color: #1F6F64;
+    background-color: rgba(31, 111, 100, 0.08);
+  }
+
+  .stamp-red {
+    color: #B3423A;
+    border-color: #B3423A;
+    background-color: rgba(179, 66, 58, 0.08);
+  }
+
+  .stamp-amber {
+    color: #8A6414;
+    border-color: #C89B3C;
+    background-color: rgba(200, 155, 60, 0.12);
+  }
+
+  .stamp-ink {
+    color: #5F636B;
+    border-color: #5F636B;
+    background-color: transparent;
+  }
+}
+
+/* Accesibilidad: respetar preferencia de movimiento reducido del sistema */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

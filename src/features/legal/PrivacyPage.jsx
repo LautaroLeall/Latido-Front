@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import LatidoLogo from '../../components/branding/LatidoLogo';
-import { usePageMeta } from '../../lib/seo';
-import Alert from '../../components/ui/Alert';
+import { buildMailUrl, buildWhatsAppUrl, CONTACT_EMAIL, displayPhone } from '../../lib/contact';
 
 const SECTIONS = [
   {
@@ -55,17 +54,6 @@ const SECTIONS = [
 ];
 
 export default function PrivacyPage() {
-  usePageMeta({
-    title: 'Política de Privacidad · Latido',
-    description: 'Cómo Latido protege los datos personales de clientes y negocios conforme a la Ley 25.326.'
-  });
-  useEffect(() => {
-    const previous = document.title;
-    document.title = 'Política de privacidad · Latido';
-    window.scrollTo({ top: 0 });
-    return () => { document.title = previous; };
-  }, []);
-
   return (
     <div className="min-h-screen bg-paper-dim">
       <header className="bg-paper border-b-[1.5px] border-ink">
@@ -80,9 +68,30 @@ export default function PrivacyPage() {
         <h1 className="text-3xl font-bold tracking-tight mt-1">Política de privacidad</h1>
         <p className="font-mono text-xs text-muted mt-2">Última actualización: noviembre de 2026</p>
 
-        <Alert variant="warning" title="Versión preliminar" className="mt-6">
-          Este texto es un borrador y debe ser revisado por un profesional antes del lanzamiento comercial.
-        </Alert>
+        <div className="mt-6 bg-paper border-[1.5px] border-teal p-4 shadow-hard-line text-xs text-ink/85 leading-relaxed">
+          <strong className="font-mono uppercase tracking-wider text-teal block mb-1">
+            Compromiso de privacidad · Ley 25.326 (Argentina)
+          </strong>
+          Las opiniones enviadas en Latido son <strong>anónimas por defecto</strong>. Si decidís dejar tus datos de contacto,
+          podés solicitar acceso, rectificación o eliminación en cualquier momento escribiendo al comercio o a{' '}
+          <a
+            href={buildMailUrl('Solicitud de privacidad (Ley 25.326) · Latido', 'Hola, quiero realizar una consulta sobre mis datos personales en Latido.')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-teal font-bold underline"
+          >
+            {CONTACT_EMAIL}
+          </a>{' '}
+          o por WhatsApp al{' '}
+          <a
+            href={buildWhatsAppUrl('Hola, quiero realizar una consulta sobre privacidad de datos en Latido.')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-teal font-bold underline"
+          >
+            {displayPhone()}
+          </a>.
+        </div>
 
         <div className="mt-8 space-y-8">
           {SECTIONS.map(s => (

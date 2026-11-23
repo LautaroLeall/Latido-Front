@@ -42,7 +42,14 @@ export default function AdminDashboard() {
   const activeTab = currentTab.id;
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [logoPromptDismissed, setLogoPromptDismissed] = useState(false);
+  const logoPromptKey = `latido_logo_prompt_dismissed_${business.id}`;
+  const [logoPromptDismissed, setLogoPromptDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem(logoPromptKey) === '1';
+    } catch {
+      return false;
+    }
+  });
   const [refreshKey, setRefreshKey] = useState(0);
   const now = useNow(30000);
 
@@ -258,7 +265,10 @@ export default function AdminDashboard() {
                 </HardButton>
                 <button
                   type="button"
-                  onClick={() => setLogoPromptDismissed(true)}
+                  onClick={() => {
+                    setLogoPromptDismissed(true);
+                    try { sessionStorage.setItem(logoPromptKey, '1'); } catch { /* noop */ }
+                  }}
                   aria-label="Ocultar aviso de logo"
                   className="p-1.5 text-muted hover:text-ink cursor-pointer"
                 >

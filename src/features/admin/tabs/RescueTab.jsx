@@ -15,11 +15,22 @@ import {
 } from '../../../lib/validators';
 
 /* ────────────────────────────────────────────────────────────────────────────
- * Tarjeta de un caso activo
- * ──────────────────────────────────────────────────────────────────────────── */
+  Tarjeta de un caso activo
+  ──────────────────────────────────────────────────────────────────────────── */
 function ActiveCaseCard({ item, business, getTemplate, now, onChanged }) {
   const contact = item.contact;
-  const initialChannel = item.contact_channel || contact?.preferred_channel || 'whatsapp';
+  const phoneCheck = validatePhone(contact?.phone || '', { required: false });
+  const emailCheck = validateEmail(contact?.email || '', { required: false });
+  const hasValidPhone = !!contact?.phone && phoneCheck.valid;
+  const hasValidEmail = !!contact?.email && emailCheck.valid;
+
+  const preferredChannel = item.contact_channel || contact?.preferred_channel || 'whatsapp';
+  const initialChannel =
+    preferredChannel === 'email' && !hasValidEmail && hasValidPhone
+      ? 'whatsapp'
+      : preferredChannel !== 'email' && !hasValidPhone && hasValidEmail
+        ? 'email'
+        : preferredChannel;
   const [channel, setChannel] = useState(initialChannel);
   const template = getTemplate(item.stars_snapshot, channel);
   const vars = {
@@ -48,11 +59,6 @@ function ActiveCaseCard({ item, business, getTemplate, now, onChanged }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId, channel]);
-
-  const phoneCheck = validatePhone(contact?.phone || '', { required: false });
-  const emailCheck = validateEmail(contact?.email || '', { required: false });
-  const hasValidPhone = !!contact?.phone && phoneCheck.valid;
-  const hasValidEmail = !!contact?.email && emailCheck.valid;
 
   const dueMs = new Date(item.sla_due_at).getTime() - now;
   const remainingMin = Math.ceil(dueMs / 60000);
@@ -171,7 +177,7 @@ function ActiveCaseCard({ item, business, getTemplate, now, onChanged }) {
         <div className="font-mono text-xs text-muted mb-4 break-words">
           Cliente: <strong className="text-ink">{contact.full_name}</strong> · Prefiere{' '}
           <strong className="text-ink">{CHANNEL_LABELS[channel]}</strong>
-          {contact.phone && <> · +{contact.phone}</>}
+          {contact.phone && <> · +{String(contact.phone).replace(/^\+/, '')}</>}
           {contact.email && <> · {contact.email}</>}
         </div>
       ) : (
@@ -236,7 +242,10 @@ function ActiveCaseCard({ item, business, getTemplate, now, onChanged }) {
           <p className="font-bold text-sm mb-2">¿Enviaste el mensaje?</p>
           <div className="flex flex-wrap gap-2">
             <HardButton size="sm" variant="teal" disabled={busy}
-              onClick={() => update({ status: 'contacted', message_sent: message, contact_channel: channel })}>
+              onClick={async () => {
+                await update({ status: 'contacted', message_sent: message.trim() || null, contact_channel: channel });
+                setAwaitingConfirm(false);
+              }}>
               Sí, enviado
             </HardButton>
             <HardButton size="sm" variant="secondary" disabled={busy} onClick={() => setAwaitingConfirm(false)}>
@@ -294,8 +303,8 @@ function ActiveCaseCard({ item, business, getTemplate, now, onChanged }) {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
- * Historial
- * ──────────────────────────────────────────────────────────────────────────── */
+  Historial
+  ──────────────────────────────────────────────────────────────────────────── */
 function HistoryList({ items, business, isAdmin, onChanged }) {
   const [erasing, setErasing] = useState(null);
   const [error, setError] = useState('');
@@ -356,8 +365,8 @@ function HistoryList({ items, business, isAdmin, onChanged }) {
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
- * Ajustes del Modo Rescate
- * ──────────────────────────────────────────────────────────────────────────── */
+  Ajustes del Modo Rescate
+  ──────────────────────────────────────────────────────────────────────────── */
 function RescueSettings({ business, isAdmin, onSaved }) {
   const [form, setForm] = useState({
     rescue_enabled: business.rescue_enabled,
@@ -367,6 +376,22 @@ function RescueSettings({ business, isAdmin, onSaved }) {
     manager_name: business.manager_name || ''
   });
   const [status, setStatus] = useState({ saving: false, error: '', ok: false });
+
+  useEffect(() => {
+    setForm({
+      rescue_enabled: business.rescue_enabled,
+      avg_ticket_value: String(business.avg_ticket_value ?? 0),
+      rescue_sla_minutes: String(business.rescue_sla_minutes ?? 60),
+      rescue_threshold: String(business.rescue_threshold ?? 2),
+      manager_name: business.manager_name || ''
+    });
+  }, [
+    business.rescue_enabled,
+    business.avg_ticket_value,
+    business.rescue_sla_minutes,
+    business.rescue_threshold,
+    business.manager_name
+  ]);
 
   const update = (key) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;

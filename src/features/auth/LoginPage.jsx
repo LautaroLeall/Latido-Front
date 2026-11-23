@@ -8,10 +8,8 @@ import { useAuth } from '../../context/AuthContext';
 import { getErrorMessage } from '../../lib/errors';
 import { buildWhatsAppUrl } from '../../lib/contact';
 import { validateEmail } from '../../lib/validators';
-import { usePageMeta } from '../../lib/seo';
 
 export default function LoginPage() {
-  usePageMeta({ title: 'Ingresar · Latido', noindex: true });
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,6 +38,7 @@ export default function LoginPage() {
       // La redirección la hace PublicOnlyRoute cuando el perfil termina de cargar
     } catch (err) {
       setError(getErrorMessage(err));
+    } finally {
       setSubmitting(false);
     }
   }

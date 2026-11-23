@@ -1,0 +1,19 @@
+# Latido — robots.txt generado automáticamente
+User-agent: *
+Allow: /
+Allow: /privacidad
+Allow: /f/demo
+Allow: /llms.txt
+Allow: /.well-known/security.txt
+Allow: /og-banner.png
+Allow: /manifest.json
+Disallow: /admin
+Disallow: /admin/
+Disallow: /super
+Disallow: /super/
+Disallow: /login
+Disallow: /recuperar
+Disallow: /reset-password
+Disallow: /f/
+
+Sitemap: https://latido-opinion.vercel.app/sitemap.xml

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+>
+  <url>
+    <loc>https://latido-opinion.vercel.app/</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="es-AR" href="https://latido-opinion.vercel.app/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://latido-opinion.vercel.app/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://latido-opinion.vercel.app/" />
+    <image:image>
+      <image:loc>https://latido-opinion.vercel.app/og-banner.png</image:loc>
+      <image:title>Latido — Feedback con QR, Chip NFC y Modo Rescate</image:title>
+      <image:caption>Plataforma de opiniones en 30 segundos con QR y chip NFC, destino Google Maps y Modo Rescate en tiempo real.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://latido-opinion.vercel.app/privacidad</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="es-AR" href="https://latido-opinion.vercel.app/privacidad" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://latido-opinion.vercel.app/privacidad" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://latido-opinion.vercel.app/privacidad" />
+  </url>
+  <url>
+    <loc>https://latido-opinion.vercel.app/f/demo</loc>
+    <lastmod>2026-11-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="es-AR" href="https://latido-opinion.vercel.app/f/demo" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://latido-opinion.vercel.app/f/demo" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://latido-opinion.vercel.app/f/demo" />
+  </url>
+</urlset>

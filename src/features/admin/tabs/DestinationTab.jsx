@@ -69,6 +69,9 @@ export default function DestinationTab({ business, isAdmin, onSaved }) {
       .maybeSingle()
       .then(({ data }) => {
         if (!cancelled) setSampleToken(data?.token || null);
+      })
+      .catch(() => {
+        if (!cancelled) setSampleToken(null);
       });
     return () => { cancelled = true; };
   }, [business.id]);

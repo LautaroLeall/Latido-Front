@@ -61,18 +61,22 @@ export default function AccountTab({ business, isAdmin, onSaved }) {
       supabase.from('branches').select('id', { count: 'exact', head: true }).eq('business_id', business.id),
       supabase.from('qr_codes').select('id, active').eq('business_id', business.id),
       supabase.from('plans').select('id, code, name, supports, price_monthly, currency, is_custom, highlighted').eq('active', true).order('sort_order', { ascending: true })
-    ]).then(([supRes, brRes, qrRes, plRes]) => {
-      if (cancelled) return;
-      setSupports(supRes.error ? null : supRes.data);
-      const qrList = qrRes.data || [];
-      setCounts({
-        branches: brRes.count ?? 0,
-        qrTotal: qrList.length,
-        qrActive: qrList.filter(q => q.active).length
+    ])
+      .then(([supRes, brRes, qrRes, plRes]) => {
+        if (cancelled) return;
+        setSupports(supRes.error ? null : supRes.data);
+        const qrList = qrRes.data || [];
+        setCounts({
+          branches: brRes.count ?? 0,
+          qrTotal: qrList.length,
+          qrActive: qrList.filter(q => q.active).length
+        });
+        if (!plRes.error) setPlans(plRes.data || []);
+        setLoadingPlan(false);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadingPlan(false);
       });
-      if (!plRes.error) setPlans(plRes.data || []);
-      setLoadingPlan(false);
-    });
     return () => { cancelled = true; };
   }, [business.id]);
 

@@ -178,11 +178,15 @@ export default function QrTab({ business, isAdmin, onOpenDestination, onOpenAcco
     Promise.all([
       supabase.from('branches').select('id, name').eq('business_id', business.id).order('created_at', { ascending: true }),
       supabase.rpc('get_my_supports')
-    ]).then(([b, s]) => {
-      if (cancelled) return;
-      if (!b.error) setBranches(b.data || []);
-      setSupports(s.error ? null : s.data);
-    });
+    ])
+      .then(([b, s]) => {
+        if (cancelled) return;
+        if (!b.error) setBranches(b.data || []);
+        setSupports(s.error ? null : s.data);
+      })
+      .catch(() => {
+        if (!cancelled) setSupports(null);
+      });
     return () => { cancelled = true; };
   }, [business.id, refreshKey]);
 

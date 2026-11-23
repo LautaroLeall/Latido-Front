@@ -29,60 +29,72 @@ export default function SurveyEditor({ business, isAdmin }) {
 
   const [status, setStatus] = useState({ saving: false, error: '', ok: '' });
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (isCancelled = () => false) => {
     setLoading(true);
     setMigrationMissing(false);
     setStatus({ saving: false, error: '', ok: '' });
 
-    const { data, error } = await supabase
-      .from('survey_questions')
-      .select('id, type, question_text, options, placeholder, active, order_index')
-      .eq('business_id', business.id)
-      .order('order_index', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('survey_questions')
+        .select('id, type, question_text, options, placeholder, active, order_index')
+        .eq('business_id', business.id)
+        .order('order_index', { ascending: true });
 
-    if (error) {
-      if (error.code === '42703' || /options|placeholder|active/i.test(error.message || '')) {
-        setMigrationMissing(true);
+      if (isCancelled()) return;
+
+      if (error) {
+        if (error.code === '42703' || /options|placeholder|active/i.test(error.message || '')) {
+          setMigrationMissing(true);
+        } else {
+          setStatus({ saving: false, error: getErrorMessage(error, 'No pudimos cargar las preguntas.'), ok: '' });
+        }
+        setLoading(false);
+        return;
+      }
+
+      const rows = data || [];
+      const byType = {};
+      for (const r of rows) {
+        if (!byType[r.type]) byType[r.type] = r;
+      }
+      setRowIds({
+        stars: byType.stars?.id || null,
+        tags: byType.tags?.id || null,
+        text: byType.text?.id || null
+      });
+
+      if (rows.length > 0) {
+        const cfg = resolveSurveyConfig(rows);
+        setStarsQuestion(cfg.starsQuestion);
+        setTagsEnabled(byType.tags ? byType.tags.active !== false : true);
+        setTagsQuestion(byType.tags?.question_text || '¿Qué aspecto querés destacar o mejorar?');
+        setTags(byType.tags?.options?.length ? byType.tags.options : DEFAULT_TAGS);
+        setCommentEnabled(byType.text ? byType.text.active !== false : true);
+        setCommentQuestion(cfg.commentQuestion);
+        setCommentPlaceholder(cfg.commentPlaceholder);
       } else {
-        setStatus({ saving: false, error: getErrorMessage(error, 'No pudimos cargar las preguntas.'), ok: '' });
+        setStarsQuestion(DEFAULT_SURVEY.starsQuestion);
+        setTagsEnabled(true);
+        setTagsQuestion('¿Qué aspecto querés destacar o mejorar?');
+        setTags(DEFAULT_TAGS);
+        setCommentEnabled(true);
+        setCommentQuestion(DEFAULT_SURVEY.commentQuestion);
+        setCommentPlaceholder(DEFAULT_SURVEY.commentPlaceholder);
       }
       setLoading(false);
-      return;
+    } catch (err) {
+      if (isCancelled()) return;
+      setStatus({ saving: false, error: getErrorMessage(err, 'No pudimos cargar las preguntas.'), ok: '' });
+      setLoading(false);
     }
-
-    const rows = data || [];
-    const byType = {};
-    for (const r of rows) {
-      if (!byType[r.type]) byType[r.type] = r;
-    }
-    setRowIds({
-      stars: byType.stars?.id || null,
-      tags: byType.tags?.id || null,
-      text: byType.text?.id || null
-    });
-
-    if (rows.length > 0) {
-      const cfg = resolveSurveyConfig(rows);
-      setStarsQuestion(cfg.starsQuestion);
-      setTagsEnabled(byType.tags ? byType.tags.active !== false : true);
-      setTagsQuestion(byType.tags?.question_text || '¿Qué aspecto querés destacar o mejorar?');
-      setTags(byType.tags?.options?.length ? byType.tags.options : DEFAULT_TAGS);
-      setCommentEnabled(byType.text ? byType.text.active !== false : true);
-      setCommentQuestion(cfg.commentQuestion);
-      setCommentPlaceholder(cfg.commentPlaceholder);
-    } else {
-      setStarsQuestion(DEFAULT_SURVEY.starsQuestion);
-      setTagsEnabled(true);
-      setTagsQuestion('¿Qué aspecto querés destacar o mejorar?');
-      setTags(DEFAULT_TAGS);
-      setCommentEnabled(true);
-      setCommentQuestion(DEFAULT_SURVEY.commentQuestion);
-      setCommentPlaceholder(DEFAULT_SURVEY.commentPlaceholder);
-    }
-    setLoading(false);
   }, [business.id]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    let cancelled = false;
+    load(() => cancelled);
+    return () => { cancelled = true; };
+  }, [load]);
 
   function addTag() {
     const tagRes = validateSurveyTag(newTag);
@@ -185,22 +197,23 @@ export default function SurveyEditor({ business, isAdmin }) {
         }
       ];
 
-      const nextIds = { ...rowIds };
-      for (const spec of specs) {
-        const existingId = rowIds[spec.key];
-        if (existingId) {
-          const { error } = await supabase
-            .from('survey_questions')
-            .update({
-              question_text: spec.question_text,
-              options: spec.options,
-              placeholder: spec.placeholder,
-              active: spec.active,
-              order_index: spec.order_index
-            })
-            .eq('id', existingId);
-          if (error) throw error;
-        } else {
+      const results = await Promise.all(
+        specs.map(async (spec) => {
+          const existingId = rowIds[spec.key];
+          if (existingId) {
+            const { error } = await supabase
+              .from('survey_questions')
+              .update({
+                question_text: spec.question_text,
+                options: spec.options,
+                placeholder: spec.placeholder,
+                active: spec.active,
+                order_index: spec.order_index
+              })
+              .eq('id', existingId);
+            if (error) throw error;
+            return [spec.key, existingId];
+          }
           const { data, error } = await supabase
             .from('survey_questions')
             .insert({
@@ -215,10 +228,11 @@ export default function SurveyEditor({ business, isAdmin }) {
             .select('id')
             .single();
           if (error) throw error;
-          nextIds[spec.key] = data.id;
-        }
-      }
+          return [spec.key, data.id];
+        })
+      );
 
+      const nextIds = Object.fromEntries(results);
       setRowIds(nextIds);
       setStatus({
         saving: false,

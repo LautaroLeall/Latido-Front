@@ -94,11 +94,29 @@ export default function ProtectedRoute({ roles, requireBusiness = false, childre
  * Rutas solo para visitantes (login, recuperar contraseña). Si ya hay sesión, redirige a su panel.
  */
 export function PublicOnlyRoute({ children }) {
-  const { configured, loading, user, profile } = useAuth();
+  const { configured, loading, user, profile, profileError, refreshProfile, signOut } = useAuth();
   const location = useLocation();
 
   if (!configured) return <ConfigMissing />;
   if (loading) return <FullScreenLoader label="Verificando sesión..." />;
+  if (user && !profile && profileError) {
+    return (
+      <FullScreenMessage
+        stamp="ERROR"
+        stampVariant="red"
+        shadow="red"
+        title="No pudimos cargar tu cuenta"
+        actions={
+          <>
+            <HardButton size="sm" onClick={refreshProfile}>Reintentar</HardButton>
+            <HardButton size="sm" variant="secondary" onClick={signOut}>Cerrar sesión</HardButton>
+          </>
+        }
+      >
+        {getErrorMessage(profileError, 'Tu perfil no está disponible en este momento.')}
+      </FullScreenMessage>
+    );
+  }
   if (user && profile) {
     // Volver a la página privada que se intentó abrir (el guard de esa ruta valida el rol)
     const from = location.state?.from;

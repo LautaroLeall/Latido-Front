@@ -74,10 +74,16 @@ export function useBusinessStats(businessId, days, refreshKey) {
     let cancelled = false;
     setState(s => ({ ...s, loading: true, error: null }));
 
-    supabase.rpc('get_business_stats', { p_days: days }).then(({ data, error }) => {
-      if (cancelled) return;
-      setState({ data: error ? null : data, loading: false, error });
-    });
+    supabase
+      .rpc('get_business_stats', { p_days: days })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        setState({ data: error ? null : data, loading: false, error });
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setState({ data: null, loading: false, error });
+      });
 
     return () => { cancelled = true; };
   }, [businessId, days, refreshKey]);
@@ -152,8 +158,11 @@ export function useRescueCases(businessId, refreshKey) {
     active: [], history: [], metrics: null, loading: true, error: null
   });
 
+  const reqRef = useRef(0);
+
   const load = useCallback(async () => {
     if (!businessId) return;
+    const reqId = ++reqRef.current;
     try {
       const [activeRes, historyRes, metricsRes] = await Promise.all([
         supabase.from('rescue_cases').select(CASE_SELECT)
@@ -169,6 +178,7 @@ export function useRescueCases(businessId, refreshKey) {
         supabase.from('rescue_metrics').select('*').eq('business_id', businessId)
       ]);
 
+      if (reqId !== reqRef.current) return;
       const firstError = activeRes.error || historyRes.error || metricsRes.error;
       if (firstError) throw firstError;
 
@@ -200,12 +210,16 @@ export function useRescueCases(businessId, refreshKey) {
         error: null
       });
     } catch (err) {
+      if (reqId !== reqRef.current) return;
       console.error('[LATIDO] Error cargando casos de rescate:', err);
       setState(s => ({ ...s, loading: false, error: err }));
     }
   }, [businessId]);
 
-  useEffect(() => { load(); }, [load, refreshKey]);
+  useEffect(() => {
+    load();
+    return () => { reqRef.current += 1; };
+  }, [load, refreshKey]);
 
   return { ...state, reload: load };
 }
@@ -217,17 +231,23 @@ export function useRescueTemplates(businessId) {
   const [templates, setTemplates] = useState([]);
 
   useEffect(() => {
-    if (!businessId) return;
+    if (!businessId) return undefined;
+    let cancelled = false;
     supabase
       .from('rescue_templates')
       .select('id, business_id, stars, channel, subject, body')
       .then(({ data, error }) => {
+        if (cancelled) return;
         if (error) {
           console.error('[LATIDO] Error cargando plantillas:', error);
           return;
         }
         setTemplates(data || []);
+      })
+      .catch((err) => {
+        if (!cancelled) console.error('[LATIDO] Error cargando plantillas:', err);
       });
+    return () => { cancelled = true; };
   }, [businessId]);
 
   const getTemplate = useCallback((stars, channel) => {
@@ -263,6 +283,10 @@ export function useQrCodes(businessId, refreshKey) {
           loading: false,
           error
         });
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setState(s => ({ ...s, loading: false, error }));
       });
 
     return () => { cancelled = true; };

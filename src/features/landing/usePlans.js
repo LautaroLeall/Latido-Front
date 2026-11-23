@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { fetchPublicTable, isPublicRpcConfigured } from '../../lib/publicRpc';
 
 /**
  * Planes de reserva: se muestran si Supabase no responde, no está configurado
@@ -13,27 +13,29 @@ export const FALLBACK_PLANS = [
   { id: 'f-custom', code: 'custom', name: 'Plan Personalizado', supports: null, price_monthly: null, currency: 'ARS', is_custom: true, highlighted: false }
 ];
 
+const PLANS_QUERY =
+  'select=id,code,name,supports,price_monthly,currency,is_custom,highlighted&active=eq.true&order=sort_order.asc';
+
 /** Planes activos y públicos, ordenados como los definió el Super Admin */
 export default function usePlans() {
   const [plans, setPlans] = useState(FALLBACK_PLANS);
   const [fromDb, setFromDb] = useState(false);
 
   useEffect(() => {
-    if (!supabase) return undefined;
-    let cancelled = false;
+    if (!isPublicRpcConfigured) return undefined;
+    const ctrl = new AbortController();
 
-    supabase
-      .from('plans')
-      .select('id, code, name, supports, price_monthly, currency, is_custom, highlighted')
-      .eq('active', true)
-      .order('sort_order', { ascending: true })
+    fetchPublicTable('plans', PLANS_QUERY, { signal: ctrl.signal, timeoutMs: 8000 })
       .then(({ data, error }) => {
-        if (cancelled || error || !data?.length) return;
+        if (ctrl.signal.aborted || error || !Array.isArray(data) || !data.length) return;
         setPlans(data);
         setFromDb(true);
+      })
+      .catch(() => {
+        // Mantiene FALLBACK_PLANS sin interrumpir la landing
       });
 
-    return () => { cancelled = true; };
+    return () => ctrl.abort();
   }, []);
 
   return { plans, fromDb };

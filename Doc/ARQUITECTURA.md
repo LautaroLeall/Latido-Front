@@ -14,10 +14,14 @@
 ## 2. Organización Real de `src/`
 
 ```text
+scripts/
+└── seoAutoPlugin.mjs       # Genera robots.txt, sitemap.xml, manifest.json, llms.txt, security.txt y prerender SEO
+vercel.json                 # Rewrites SPA, caché inmutable, CSP estricto, HSTS y X-Robots-Tag privado
 src/
 ├── components/
 │   ├── branding/           # LatidoLogo, LatidoSymbol, BusinessLogo, BusinessMonogram
-│   └── ui/                 # Alert, Field, FullScreen, HardButton, PasswordChecklist, PerfEdge, Stamp, StarIcon, TicketCard
+│   ├── layout/             # RouteSEO, ScrollToTop
+│   └── ui/                 # Alert, ErrorBoundary, Field, FullScreen, HardButton, PasswordChecklist, PerfEdge, Stamp, StarIcon, TicketCard
 ├── context/
 │   └── AuthContext.jsx     # Sesión Supabase + perfil + negocio/plan (solo fuera de /f/:token)
 ├── features/
@@ -30,15 +34,16 @@ src/
 │   ├── feedback/           # FeedbackView.jsx (/f/:token y /f/demo; modos panel / google directo / both)
 │   ├── landing/            # Landing pública (Hero, Mockup, Stats, LiveDemo, Features, ForWho, Quote, Pricing, FAQ, CTA)
 │   ├── legal/              # PrivacyPage.jsx (/privacidad)
-│   └── super/              # SuperDashboard.jsx, CreateBusinessForm.jsx, PlansManager.jsx
+│   └── super/              # SuperDashboard.jsx, BusinessDetailDrawer.jsx, CreateBusinessForm.jsx, PlansManager.jsx
 ├── hooks/
-│   └── useNow.js           # Reloj para cuentas regresivas SLA
+│   └── useNow.js           # Reloj para cuentas regresivas SLA (pausa automática en segundo plano)
 ├── lib/
 │   ├── contact.js          # URLs comerciales WhatsApp / Mail / Gmail
 │   ├── errors.js           # Traducción de códigos de Supabase Auth / Postgres a español
 │   ├── logoUpload.js       # Validación y optimización canvas (≤512px) + subida/borrado en Storage
-│   ├── publicRpc.js        # Llamadas livianas PostgREST para /f/:token sin cargar el SDK completo
-│   ├── seo.js              # Metadatos dinámicos y `noindex` en rutas privadas/tickets
+│   ├── publicRpc.js        # Llamadas livianas PostgREST con timeout (12s) y AbortSignal sin SDK completo
+│   ├── seoConfig.js        # Configuración SEO/canonical/robots por ruta (testable directo en Node)
+│   ├── seo.js              # Hook `usePageMeta` para overrides dinámicos (nombre del negocio)
 │   ├── supabaseClient.js   # Cliente oficial Supabase (Auth, Realtime, Storage, DB)
 │   ├── surveyConfig.js     # Preguntas predeterminadas, plantillas por rubro y resolver del ticket
 │   ├── utils.js            # Formateo E.164/moneda/fechas, monograma, plantillas, openExternalInNewTab
@@ -48,8 +53,8 @@ src/
 │   ├── AppRoutes.jsx
 │   └── ProtectedRoute.jsx
 ├── styles/index.css        # Utilidades `.perf-edge`, `.stamp`, `:focus-visible` y `prefers-reduced-motion`
-├── App.jsx                 # Aísla /f/:token de AuthProvider para carga < 110 KB gzip
-└── main.jsx
+├── App.jsx                 # ErrorBoundary + RouteSEO + ScrollToTop + aislamiento de /f/:token (< 115 KB gzip)
+└── main.jsx                # Carga no bloqueante CSP-strict de Google Fonts + montaje React
 ```
 
 ---
@@ -63,5 +68,5 @@ src/
    - No existe `/registro` ni `/onboarding`. Las cuentas de negocios las crea el Super Admin en `/super` invocando la Edge Function `create-business-account`.
 3. **Enlaces externos seguros**:
    - Todos los envíos por WhatsApp, Email y Gmail abren siempre en una pestaña nueva (`target="_blank" rel="noopener noreferrer"` u `openExternalInNewTab()`) para nunca perder ni romper la sesión de Latido.
-4. **Pruebas automatizadas (`npm test`)**:
-   - `tests/validators.test.mjs` (61 pruebas), `tests/survey.test.mjs` (9 pruebas) y `tests/hygiene.test.mjs` (UTF-8, ausencia de `/registro` y auditoría de enlaces externos).
+4. **Pruebas y CI automatizado (`npm test` / `npm run verify` / `.github/workflows/ci.yml`)**:
+   - `tests/validators.test.mjs` (61 pruebas), `tests/survey.test.mjs` (9 pruebas), `tests/hygiene.test.mjs` (UTF-8, ausencia de `/registro` y enlaces externos seguros) y `tests/seo.test.mjs` (validación de `vercel.json`, CSP, HSTS, JSON-LD, OG PNG, `robots.txt`, `sitemap.xml`, `manifest.json`, `llms.txt` y `.well-known/security.txt`).

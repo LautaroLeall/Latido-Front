@@ -118,3 +118,35 @@ Registro cronológico de avances, decisiones, fallas resueltas y tareas pendient
     - SEO y favicon: corregido `/latido-icono-app.svg`, meta tags Open Graph/Twitter en `index.html` y `lib/seo.js` con `noindex` en paneles y tickets reales.
     - Documentación sincronizada (`ARQUITECTURA.md` y `Doc/README.md` con enlaces relativos).
     - `/f/demo` incluye link `← Volver a Latido` y sello `Demo` manteniendo idéntico el ticket real.
+
+---
+
+## [2026-11-23] — Estándar de Producción (SEO/GEO, Seguridad HTTP, Resiliencia, Velocidad y CI)
+
+### Avances (alineado con estándares de NutriOliva y Portafolio-LLDP)
+
+- **Despliegue y Seguridad HTTP (`vercel.json` + `.well-known/security.txt`)**:
+  - Agregado `vercel.json` con `cleanUrls: true`, rewrites SPA seguros (evitan 404 en `/f/:token`, `/admin`, `/super`, `/privacidad` en Vercel), caché inmutable de 1 año en `/assets/*`, `X-Robots-Tag: noindex, nofollow, noarchive` + `Cache-Control: no-store` en paneles privados y headers estrictos globales (`HSTS` 2 años + preload, `CSP` sin `unsafe-inline` en `script-src`, `X-Content-Type-Options: nosniff`, `Cross-Origin-Opener-Policy: same-origin-allow-popups`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors` acotado a propio dominio y `lautarolealdev.com`).
+  - Agregado `public/.well-known/security.txt` (RFC 9116).
+- **SEO, GEO y Pre-renderizado Automatizado (`scripts/seoAutoPlugin.mjs` + `src/lib/seoConfig.js` + `RouteSEO.jsx` + `ScrollToTop.jsx`)**:
+  - Plugin Vite automatizado que sincroniza en cada `dev`/`build` `robots.txt`, `sitemap.xml` (con `hreflang es-AR` e imagen OG), `manifest.json` (PWA), `llms.txt` (GEO/IA) y `.well-known/security.txt`, pre-renderiza rutas públicas (`/privacidad`, `/f/demo`) con JSON-LD y valida longitudes SEO al compilar.
+  - Generados assets PNG optimizados (`og-banner.png` 1200×630, `apple-touch-icon.png` 180×180, `icon-192.png`, `icon-512.png`).
+  - `index.html` actualizado con `lang="es-AR"`, Geo-SEO (Tucumán, Argentina), Open Graph PNG absoluto, JSON-LD `@graph` (`SoftwareApplication`, `Organization`, `WebSite`, `FAQPage`), `preconnect` a Supabase y carga no bloqueante CSP-strict de Google Fonts desde `src/main.jsx`.
+- **Corrección de fallas de lógica, resiliencia y velocidad**:
+  - `ErrorBoundary.jsx` global en estilo ticket para capturar errores inesperados y fallos de chunks tras un despliegue en Vercel.
+  - `publicRpc.js`: timeout automático de 12s con `AbortController` + helper `fetchPublicTable` para que `usePlans.js` cargue planes de la landing sin depender del SDK completo de Supabase.
+  - `FeedbackView.jsx`: reinicio limpio del estado al cambiar `:token` y cancelación con `AbortController`.
+  - `RescueTab.jsx`: corregido doble signo `++` al mostrar teléfonos guardados en E.164, selección inteligente del canal por defecto según los datos válidos del cliente, `trim()` en confirmación de envío y sincronización de `RescueSettings` con cambios externos.
+  - `AuthContext.jsx` + `ProtectedRoute.jsx` + `LoginPage.jsx`: `.catch()` en `getSession()`, protección contra carreras en `loadProfile`, eliminación de dependencia redundante `profileLoading` en `useMemo`, y pantalla de recuperación en `PublicOnlyRoute` si falla el perfil (evita bloqueo en `INGRESANDO...`).
+  - `SurveyEditor.jsx`: guardado en paralelo con `Promise.all` (3× más rápido) y guarda de cancelación al desmontar.
+  - `useAdminData.js`, `QrTab.jsx`, `AccountTab.jsx`, `DestinationTab.jsx`: `.catch()` y guardas de desmontaje en todas las cargas asíncronas.
+  - `SuperDashboard.jsx`: `try/catch/finally` en carga, pestaña sincronizada con `?tab=` en la URL y búsqueda insensible a tildes.
+  - `useNow.js`: pausa automática en pestañas ocultas (`visibilitychange`).
+  - `PrivacyPage.jsx`: eliminado `useEffect` duplicado que competía por `document.title`.
+  - `AdminDashboard.jsx`: persistencia por sesión del descarte del aviso de logo.
+- **Pruebas y CI automatizado**:
+  - Nueva suite `tests/seo.test.mjs` (6/6 OK) + refuerzo de `tests/hygiene.test.mjs` + script `npm run verify`.
+  - Workflow `.github/workflows/ci.yml` en GitHub Actions (`build`, `test` y `npm audit --audit-level=high`).
+- **Panel Super Admin — Diagnóstico de acompañamiento por negocio (`BusinessDetailDrawer.jsx`)**:
+  - Nuevo panel lateral deslizable de solo lectura accesible desde el botón **Ver** / **Detalle** o haciendo clic sobre el nombre de cada negocio en `SuperDashboard.jsx`.
+  - Consume `get_business_diagnostics(p_business_id)` (con degradación elegante si aún no se aplicó la migración 012) mostrando: diagnóstico automático de acompañamiento (_cómo ayudar hoy_ + botón de sugerencias por WhatsApp/Gmail en pestaña nueva), rendimiento y tendencia (7d, 30d vs 30d previos, distribución de estrellas, top 6 aspectos), salud del Modo Rescate (tasa, SLA, tiempo de primer contacto, ventas recuperadas), configuración actual del local, desglose por sucursal (QRs y chips NFC) y últimas 12 opiniones estrictamente anonimizadas (Ley 25.326).

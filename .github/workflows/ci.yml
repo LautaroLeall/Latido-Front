@@ -1,0 +1,34 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, LautyGod]
+  pull_request:
+    branches: [main, LautyGod]
+
+jobs:
+  verify:
+    name: Pruebas, SEO, Seguridad y Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar y generar archivos SEO/GEO + prerender
+        run: npm run build
+
+      - name: Ejecutar validadores, encuesta, higiene y auditoría SEO/HTTP
+        run: npm test
+
+      - name: Auditar vulnerabilidades críticas/altas
+        run: npm audit --audit-level=high

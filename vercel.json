@@ -1,7 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
     {
@@ -45,7 +44,7 @@
       ]
     },
     {
-      "source": "/(admin|super|recuperar|reset-password)(.*)",
+      "source": "/(admin|super|login|recuperar|reset-password)(.*)",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -93,7 +92,15 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/|\\.well-known/|robots\\.txt|sitemap\\.xml|llms\\.txt|manifest\\.json|.*\\.(?:svg|png|jpg|jpeg|webp|ico|css|js|map|json|xml|txt|woff2?)$).*)",
+      "source": "/privacidad",
+      "destination": "/prerender/privacidad.html"
+    },
+    {
+      "source": "/f/demo",
+      "destination": "/prerender/f-demo.html"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]

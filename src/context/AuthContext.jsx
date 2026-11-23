@@ -23,7 +23,6 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [authReady, setAuthReady] = useState(!supabase);
   const [profile, setProfile] = useState(null);
-  const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState(null);
   const [recoveryMode, setRecoveryMode] = useState(false);
 
@@ -33,33 +32,46 @@ export function AuthProvider({ children }) {
   //    (recomendación oficial: evita bloqueos del cliente de Auth).
   useEffect(() => {
     if (!supabase) return undefined;
+    let mounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setAuthReady(true);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!mounted) return;
+        setSession(data.session);
+        setAuthReady(true);
+      })
+      .catch((err) => {
+        console.error('[LATIDO] Error inicializando sesión:', err);
+        if (mounted) setAuthReady(true);
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (!mounted) return;
       if (event === 'PASSWORD_RECOVERY') setRecoveryMode(true);
       if (event === 'SIGNED_OUT') setRecoveryMode(false);
       setSession(newSession);
       setAuthReady(true);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  // 2) Perfil: se carga cada vez que cambia el usuario
+  // 2) Perfil: se carga cada vez que cambia el usuario (protegido contra respuestas fuera de orden)
   const profileRef = useRef(null);
+  const reqIdRef = useRef(0);
   useEffect(() => { profileRef.current = profile; }, [profile]);
 
   const loadProfile = useCallback(async (uid) => {
+    const reqId = ++reqIdRef.current;
     if (!supabase || !uid) {
       setProfile(null);
       setProfileError(null);
       return null;
     }
-    setProfileLoading(true);
     setProfileError(null);
     try {
       let { data, error } = await supabase
@@ -77,11 +89,13 @@ export function AuthProvider({ children }) {
           .maybeSingle());
       }
 
+      if (reqId !== reqIdRef.current) return null;
       if (error) throw error;
       if (!data) throw new Error('No encontramos tu perfil de usuario.');
       setProfile(data);
       return data;
     } catch (err) {
+      if (reqId !== reqIdRef.current) return null;
       console.error('[LATIDO] Error cargando perfil:', err);
       // Si ya teníamos el perfil de este mismo usuario, lo conservamos (falló solo el refresco)
       if (profileRef.current?.id !== uid) {
@@ -89,8 +103,6 @@ export function AuthProvider({ children }) {
         setProfileError(err);
       }
       return null;
-    } finally {
-      setProfileLoading(false);
     }
   }, []);
 
@@ -149,7 +161,7 @@ export function AuthProvider({ children }) {
     updatePassword,
     refreshProfile
   }), [
-    session, profile, authReady, userId, profileLoading, profileError, recoveryMode,
+    session, profile, authReady, userId, profileError, recoveryMode,
     signIn, signOut, sendPasswordReset, updatePassword, refreshProfile
   ]);
 

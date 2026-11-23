@@ -1,6 +1,9 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import { FullScreenLoader } from './components/ui/FullScreen';
+import RouteSEO from './components/layout/RouteSEO';
+import ScrollToTop from './components/layout/ScrollToTop';
 
 // El ticket público (/f/:token) se aísla del SDK completo de Supabase y de AuthProvider
 // para cargar en < 1.5s en 4G y mantener el bundle por debajo de 150 KB gzip.
@@ -21,10 +24,14 @@ function RootSwitch() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Suspense fallback={<FullScreenLoader />}>
-        <RootSwitch />
-      </Suspense>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ScrollToTop />
+        <RouteSEO />
+        <Suspense fallback={<FullScreenLoader />}>
+          <RootSwitch />
+        </Suspense>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }

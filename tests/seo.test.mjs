@@ -27,9 +27,24 @@ check('SITE_URL apunta al dominio HTTPS de producción', () => {
 
 check('vercel.json es JSON válido con rewrites SPA y headers de seguridad', () => {
   const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
-  assert.equal(cfg.cleanUrls, true);
-  assert.ok(Array.isArray(cfg.rewrites) && cfg.rewrites.length > 0);
-  assert.ok(cfg.rewrites.some(r => r.destination === '/index.html'));
+  assert.equal(cfg.trailingSlash, false);
+  assert.notEqual(
+    cfg.cleanUrls,
+    true,
+    'cleanUrls: true rompe rewrites con destino /index.html en Vercel (causa 404 en rutas dinámicas)'
+  );
+  assert.ok(Array.isArray(cfg.rewrites) && cfg.rewrites.length >= 3);
+  assert.ok(
+    cfg.rewrites.some(r => r.source === '/privacidad' && r.destination === '/prerender/privacidad.html'),
+    'Falta rewrite prerenderizado /privacidad -> /prerender/privacidad.html'
+  );
+  assert.ok(
+    cfg.rewrites.some(r => r.source === '/f/demo' && r.destination === '/prerender/f-demo.html'),
+    'Falta rewrite prerenderizado /f/demo -> /prerender/f-demo.html'
+  );
+  const lastRewrite = cfg.rewrites[cfg.rewrites.length - 1];
+  assert.equal(lastRewrite.source, '/(.*)', 'El fallback SPA final debe ser /(.*)');
+  assert.equal(lastRewrite.destination, '/index.html', 'El fallback SPA final debe apuntar a /index.html');
 
   const globalRule = cfg.headers.find(h => h.source === '/(.*)');
   assert.ok(globalRule, 'Falta regla global de headers /(.*)');
@@ -75,10 +90,22 @@ check('index.html tiene JSON-LD válido, canonical, OG PNG absoluto y cero handl
   }
 });
 
-check('Assets PNG de marca y redes existen y no están vacíos', () => {
-  for (const file of ['og-banner.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) {
+check('Assets PNG de marca, favicon.ico multi-resolución y redes existen y son válidos', () => {
+  for (const file of ['og-banner.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'favicon.ico']) {
     const stat = fs.statSync(path.join(PUBLIC, file));
     assert.ok(stat.size > 500, `${file} está vacío o corrupto`);
+  }
+  const icoBuf = fs.readFileSync(path.join(PUBLIC, 'favicon.ico'));
+  assert.deepEqual([...icoBuf.subarray(0, 4)], [0, 0, 1, 0], 'favicon.ico no tiene cabecera ICO válida');
+  const frameCount = icoBuf.readUInt16LE(4);
+  assert.ok(frameCount >= 5, `favicon.ico debe ser multi-resolución (>=5 tamaños), tiene ${frameCount}`);
+  const widths = [];
+  for (let i = 0; i < frameCount; i++) {
+    const w = icoBuf[6 + i * 16];
+    widths.push(w === 0 ? 256 : w);
+  }
+  for (const expected of [16, 32, 48, 64, 256]) {
+    assert.ok(widths.includes(expected), `favicon.ico falta resolución ${expected}x${expected}`);
   }
 });
 

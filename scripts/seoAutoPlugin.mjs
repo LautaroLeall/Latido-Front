@@ -39,6 +39,7 @@ function unescapeBasicHtml(str = '') {
 const PUBLIC_PRERENDER_ROUTES = [
   {
     path: '/privacidad',
+    outputFile: 'prerender/privacidad.html',
     changefreq: 'monthly',
     priority: '0.6',
     breadcrumbName: 'Política de Privacidad',
@@ -59,6 +60,7 @@ const PUBLIC_PRERENDER_ROUTES = [
   },
   {
     path: '/f/demo',
+    outputFile: 'prerender/f-demo.html',
     changefreq: 'weekly',
     priority: '0.9',
     breadcrumbName: 'Demo Interactiva del Ticket',
@@ -98,6 +100,7 @@ function generateRobotsTxt() {
     'Disallow: /recuperar',
     'Disallow: /reset-password',
     'Disallow: /f/',
+    'Disallow: /prerender/',
     '',
     `Sitemap: ${SITE_URL}/sitemap.xml`,
     ''
@@ -404,11 +407,9 @@ export function latidoAutoSeoPlugin() {
       for (const routeObj of PUBLIC_PRERENDER_ROUTES) {
         validateRouteSeoBounds(routeObj.path, routeObj.title, routeObj.description);
         const renderedHtml = renderRouteHtml(baseHtml, routeObj);
-        const rel = routeObj.path.replace(/^\/+/, '');
-        const dirTarget = path.join(resolvedOutDir, rel);
-        fs.mkdirSync(dirTarget, { recursive: true });
-        fs.writeFileSync(path.join(dirTarget, 'index.html'), renderedHtml, 'utf8');
-        fs.writeFileSync(path.join(resolvedOutDir, `${rel}.html`), renderedHtml, 'utf8');
+        const htmlTarget = path.join(resolvedOutDir, routeObj.outputFile);
+        fs.mkdirSync(path.dirname(htmlTarget), { recursive: true });
+        fs.writeFileSync(htmlTarget, renderedHtml, 'utf8');
       }
     }
   };

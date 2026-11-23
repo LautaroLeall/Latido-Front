@@ -15,5 +15,6 @@ Disallow: /login
 Disallow: /recuperar
 Disallow: /reset-password
 Disallow: /f/
+Disallow: /prerender/
 
 Sitemap: https://latido-opinion.vercel.app/sitemap.xml

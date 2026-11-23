@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Building2, PlusCircle, Tags, LogOut, Menu, X, Mail, MessageCircle,
-  ExternalLink, Pencil, Check, RotateCw
+  ExternalLink, Pencil, Check, RotateCw, Eye
 } from 'lucide-react';
 import LatidoLogo from '../../components/branding/LatidoLogo';
 import BusinessLogo from '../../components/branding/BusinessLogo';
@@ -11,13 +12,16 @@ import Alert from '../../components/ui/Alert';
 import { StatCard, EmptyState } from '../admin/components/PanelBits';
 import PlansManager from './PlansManager';
 import CreateBusinessForm from './CreateBusinessForm';
+import BusinessDetailDrawer from './BusinessDetailDrawer';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
 import { getErrorMessage } from '../../lib/errors';
 import { buildFeedbackUrl, formatDateTime, formatMoney } from '../../lib/utils';
 import { buildGmailUrl } from '../../lib/contact';
 import { validateBusinessName, validateNumberRange } from '../../lib/validators';
-import { usePageMeta } from '../../lib/seo';
+
+const normalizeSearch = (str = '') =>
+  String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
 const NAV = [
   { id: 'negocios', label: 'Negocios', subtitle: 'Control global de cuentas, planes, soportes y estado', icon: Building2 },
@@ -49,8 +53,14 @@ function buildReminderText(b) {
  * El Super Admin NO puede leer comentarios ni contactos de clientes finales (bloqueado por RLS).
  */
 export default function SuperDashboard() {
-  usePageMeta({ title: 'Super Admin · Latido', noindex: true });
   const { profile, signOut } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentNav = NAV.find(n => n.id === searchParams.get('tab')) || NAV[0];
+  const view = currentNav.id;
+  const setView = useCallback((id) => {
+    setSearchParams(id === 'negocios' ? {} : { tab: id }, { replace: true });
+  }, [setSearchParams]);
+
   const [rows, setRows] = useState([]);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,26 +69,31 @@ export default function SuperDashboard() {
   const [actionError, setActionError] = useState('');
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // all | active | suspended
-  const [view, setView] = useState('negocios');
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Edición inline del nombre del negocio
+  // Edición inline del nombre del negocio y drawer de diagnóstico (solo lectura)
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState('');
+  const [detailBusiness, setDetailBusiness] = useState(null);
 
   const load = useCallback(async () => {
     setError(null);
-    const [ov, pl] = await Promise.all([
-      supabase.rpc('get_platform_overview'),
-      supabase.from('plans').select('*').order('sort_order', { ascending: true })
-    ]);
-    const err = ov.error || pl.error;
-    if (err) setError(err);
-    else {
-      setRows(ov.data || []);
-      setPlans(pl.data || []);
+    try {
+      const [ov, pl] = await Promise.all([
+        supabase.rpc('get_platform_overview'),
+        supabase.from('plans').select('*').order('sort_order', { ascending: true })
+      ]);
+      const err = ov.error || pl.error;
+      if (err) setError(err);
+      else {
+        setRows(ov.data || []);
+        setPlans(pl.data || []);
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -142,20 +157,18 @@ export default function SuperDashboard() {
   }, [rows, plans]);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = normalizeSearch(query.trim());
     return rows.filter(b => {
       if (statusFilter === 'active' && !b.active) return false;
       if (statusFilter === 'suspended' && b.active) return false;
       if (!q) return true;
       return (
-        b.name.toLowerCase().includes(q) ||
-        (b.owner_email || '').toLowerCase().includes(q) ||
-        (b.owner_name || '').toLowerCase().includes(q)
+        normalizeSearch(b.name).includes(q) ||
+        normalizeSearch(b.owner_email).includes(q) ||
+        normalizeSearch(b.owner_name).includes(q)
       );
     });
   }, [rows, query, statusFilter]);
-
-  const currentNav = NAV.find(n => n.id === view) || NAV[0];
 
   function selectView(id) {
     setMenuOpen(false);
@@ -426,6 +439,9 @@ export default function SuperDashboard() {
                           </div>
 
                           <div className="flex flex-wrap gap-2 pt-2 border-t border-dashed border-line-gray">
+                            <HardButton size="sm" variant="primary" onClick={() => setDetailBusiness(b)}>
+                              <Eye size={13} /> Detalle
+                            </HardButton>
                             <HardButton as="a" size="sm" variant="secondary" href={waHref} target="_blank" rel="noopener noreferrer">
                               <MessageCircle size={13} /> WP
                             </HardButton>
@@ -512,7 +528,14 @@ export default function SuperDashboard() {
                                       </div>
                                     ) : (
                                       <div className="flex items-center gap-1.5">
-                                        <span className="font-semibold">{b.name}</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => setDetailBusiness(b)}
+                                          className="font-semibold text-left hover:text-teal hover:underline cursor-pointer"
+                                          title="Ver diagnóstico y detalles del negocio"
+                                        >
+                                          {b.name}
+                                        </button>
                                         <button
                                           type="button"
                                           title="Editar nombre del negocio"
@@ -571,6 +594,14 @@ export default function SuperDashboard() {
                               <td className="p-3"><Stamp variant={b.active ? 'teal' : 'red'}>{b.active ? 'Activo' : 'Suspendido'}</Stamp></td>
                               <td className="p-3">
                                 <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => setDetailBusiness(b)}
+                                    title="Ver diagnóstico y detalles del negocio"
+                                    className="inline-flex items-center gap-1 px-2 py-1 border border-ink bg-paper-dim hover:bg-ink hover:text-paper font-mono text-[11px] font-bold uppercase tracking-wider cursor-pointer transition-colors"
+                                  >
+                                    <Eye size={13} /> Ver
+                                  </button>
                                   <a href={waHref} target="_blank" rel="noopener noreferrer" title="Enviar acceso por WhatsApp"
                                     className="p-1.5 border border-line-gray hover:border-ink text-muted hover:text-teal transition-colors">
                                     <MessageCircle size={14} />
@@ -612,11 +643,18 @@ export default function SuperDashboard() {
           )}
 
           <p className="font-mono text-xs text-muted p-3 border border-line-gray bg-paper-dim">
-            <strong>Aislamiento y Ley 25.326:</strong> el rol Super Admin administra cuentas de negocios y métricas agregadas,
+            <strong>Aislamiento y Ley 25.326:</strong> el rol Super Admin administra cuentas de negocios, diagnósticos de salud y actividad anonimizada,
             pero no tiene acceso a comentarios ni datos personales de clientes finales (bloqueado en la base de datos).
           </p>
         </main>
       </div>
+
+      {detailBusiness && (
+        <BusinessDetailDrawer
+          business={detailBusiness}
+          onClose={() => setDetailBusiness(null)}
+        />
+      )}
     </div>
   );
 }

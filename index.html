@@ -1,37 +1,202 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-AR">
 
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/latido-icono-app.svg" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.json" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#1A1D29" />
-  <title>Latido — Cada opinión, a tiempo.</title>
-  <meta name="description"
-    content="Plataforma física y digital con QR y chip NFC para recibir opiniones en 30 segundos, impulsar reseñas en Google y rescatar clientes insatisfechos en tiempo real." />
 
-  <!-- Open Graph / Redes sociales -->
+  <!-- Primary Meta Tags -->
+  <title>Latido — Feedback con QR, Chip NFC y Modo Rescate | Argentina</title>
+  <meta name="title" content="Latido — Feedback con QR, Chip NFC y Modo Rescate | Argentina" />
+  <meta name="description"
+    content="Recibí opiniones en 30 segundos con QR y chip NFC sin instalar apps. Impulsá reseñas en Google Maps y rescatá clientes insatisfechos en tiempo real." />
+  <meta name="keywords"
+    content="Latido, feedback con QR, chip NFC opiniones, reseñas Google Maps, Modo Rescate clientes, encuesta de satisfaccion QR, opiniones en tiempo real, software para comercios, software para restaurantes, feedback locales Argentina, QR NFC Tucuman, experiencia del cliente, satisfaccion del cliente" />
+  <meta name="author" content="Latido" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="theme-color" content="#1A1D29" />
+  <meta name="application-name" content="Latido" />
+  <meta name="apple-mobile-web-app-title" content="Latido" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+
+  <!-- Canonical & Alternates -->
+  <link rel="canonical" href="https://latido-opinion.vercel.app/" />
+  <link rel="alternate" hreflang="es-AR" href="https://latido-opinion.vercel.app/" />
+  <link rel="alternate" hreflang="es" href="https://latido-opinion.vercel.app/" />
+  <link rel="alternate" hreflang="x-default" href="https://latido-opinion.vercel.app/" />
+
+  <!-- Geo-SEO Local y Regional (Tucumán, Argentina) -->
+  <meta name="geo.region" content="AR-T" />
+  <meta name="geo.placename" content="San Miguel de Tucumán, Tucumán, Argentina" />
+  <meta name="geo.position" content="-26.824141;-65.222603" />
+  <meta name="ICBM" content="-26.824141, -65.222603" />
+
+  <!-- Open Graph / WhatsApp / Instagram / LinkedIn / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="es_AR" />
   <meta property="og:site_name" content="Latido" />
+  <meta property="og:url" content="https://latido-opinion.vercel.app/" />
   <meta property="og:title" content="Latido — Cada opinión, a tiempo." />
   <meta property="og:description"
-    content="Tus clientes opinan en 30 segundos escaneando un QR o acercando el celular al chip NFC. Vos te enterás al instante y rescatás al que se fue enojado." />
-  <meta property="og:image" content="/latido-logo-horizontal.svg" />
+    content="Recibí opiniones en 30 segundos con QR y chip NFC sin instalar apps. Impulsá reseñas en Google Maps y rescatá clientes insatisfechos en tiempo real." />
+  <meta property="og:image" content="https://latido-opinion.vercel.app/og-banner.png" />
+  <meta property="og:image:secure_url" content="https://latido-opinion.vercel.app/og-banner.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt"
+    content="Latido — Plataforma de feedback con QR, chip NFC, Google Maps y Modo Rescate" />
+
+  <!-- Twitter / X Card -->
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://latido-opinion.vercel.app/" />
   <meta name="twitter:title" content="Latido — Cada opinión, a tiempo." />
   <meta name="twitter:description"
-    content="Feedback en tiempo real con QR + NFC, destino de reseñas en Google y Modo Rescate." />
+    content="Feedback en tiempo real con QR + chip NFC, destino Google Maps y Modo Rescate para comercios en Argentina." />
+  <meta name="twitter:image" content="https://latido-opinion.vercel.app/og-banner.png" />
+  <meta name="twitter:image:alt" content="Latido — Cada opinión, a tiempo." />
 
+  <!-- Datos Estructurados Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://latido-opinion.vercel.app/#software",
+        "name": "Latido",
+        "alternateName": ["Latido Opinión", "Latido QR NFC"],
+        "url": "https://latido-opinion.vercel.app/",
+        "image": "https://latido-opinion.vercel.app/og-banner.png",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web, Android, iOS, Windows, macOS",
+        "inLanguage": "es-AR",
+        "description": "Plataforma física y digital con código QR y chip NFC para recibir opiniones de clientes en 30 segundos, impulsar reseñas en Google Maps y rescatar clientes insatisfechos con Modo Rescate en tiempo real.",
+        "featureList": [
+          "Ticket de opinión en 30 segundos mediante código QR y chip NFC sin apps",
+          "Modo Rescate con reloj SLA y plantillas listas para WhatsApp, Email y llamada",
+          "Destino flexible: solo panel Latido, redirección directa a Google Maps o ambos",
+          "Editor visual de preguntas del formulario y logo propio por negocio",
+          "Panel en tiempo real multi-sucursal y privacidad Ley 25.326"
+        ],
+        "offers": {
+          "@type": "AggregateOffer",
+          "priceCurrency": "ARS",
+          "lowPrice": "50000",
+          "highPrice": "175000",
+          "offerCount": "4"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://latido-opinion.vercel.app/#organization",
+        "name": "Latido",
+        "url": "https://latido-opinion.vercel.app/",
+        "logo": "https://latido-opinion.vercel.app/icon-512.png",
+        "email": "lautaroleal4@gmail.com",
+        "telephone": "+5493813399463",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "San Miguel de Tucumán",
+          "addressRegion": "Tucumán",
+          "addressCountry": "AR"
+        },
+        "areaServed": [
+          { "@type": "AdministrativeArea", "name": "Tucumán" },
+          { "@type": "Country", "name": "Argentina" }
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://latido-opinion.vercel.app/#website",
+        "url": "https://latido-opinion.vercel.app/",
+        "name": "Latido — Cada opinión, a tiempo.",
+        "inLanguage": "es-AR",
+        "publisher": { "@id": "https://latido-opinion.vercel.app/#organization" }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://latido-opinion.vercel.app/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Qué es un soporte de Latido?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Es el kit físico que va en tu mostrador: una lámina impresa con tu logo y un código QR, un soporte de acrílico y un chip NFC pegado atrás. El QR y el chip abren el mismo ticket de opinión."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Mis clientes tienen que instalar una app?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Escanean el QR con la cámara o acercan el celular al chip NFC y se abre en el navegador, sin descargar ni registrarse."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Qué es el Modo Rescate?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Cuando un cliente deja una nota baja y sus datos, se abre un caso con cuenta regresiva SLA y un mensaje listo para enviar por WhatsApp o email, registrando clientes recuperados y ventas estimadas."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Latido me ayuda con las reseñas de Google?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí. Podés dirigir tu QR directo a Google Maps o invitar a todos tus clientes a dejar una reseña en Google después de opinar en Latido, sin filtrar por puntaje para respetar las políticas de Google."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- API & Fonts Preconnect + Carga no bloqueante CSP-strict (sin handlers inline) -->
+  <link rel="preconnect" href="https://pocsdftehmjdwzvjcfcw.supabase.co" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-    rel="stylesheet" />
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" />
+  <noscript>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet" />
+  </noscript>
 </head>
 
 <body class="bg-paper-dim text-ink font-sans antialiased min-h-screen">
-  <div id="root"></div>
+  <div id="root">
+    <main
+      style="min-height:100vh;max-width:960px;margin:0 auto;padding:5rem 1.5rem 3rem;font-family:'Space Grotesk',system-ui,sans-serif;color:#1A1D29;">
+      <p
+        style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;font-weight:700;color:#1F6F64;letter-spacing:0.08em;text-transform:uppercase;margin:0 0 0.75rem;">
+        FEEDBACK · QR + CHIP NFC · MODO RESCATE
+      </p>
+      <h1 style="font-size:clamp(2rem,4.5vw,3.25rem);font-weight:700;line-height:1.1;margin:0 0 1rem;">
+        Latido — Cada opinión, a tiempo.
+      </h1>
+      <p style="font-size:1.05rem;line-height:1.65;color:#3D414D;max-width:680px;margin:0 0 1.75rem;">
+        Tus clientes opinan en 30 segundos escaneando un QR o acercando el celular al chip NFC, sin instalar apps.
+        Recibí cada opinión en tiempo real, impulsá tus reseñas en Google Maps y rescatá clientes insatisfechos antes de
+        perderlos.
+      </p>
+      <nav aria-label="Navegación principal" style="font-family:'IBM Plex Mono',monospace;font-size:0.85rem;">
+        <a href="https://latido-opinion.vercel.app/f/demo" style="color:#1F6F64;margin-right:1.25rem;">Probar el ticket
+          demo</a>
+        <a href="https://latido-opinion.vercel.app/privacidad" style="color:#1F6F64;">Política de privacidad</a>
+      </nav>
+    </main>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

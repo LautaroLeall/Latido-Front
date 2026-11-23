@@ -1,16 +1,18 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { latidoAutoSeoPlugin } from './scripts/seoAutoPlugin.mjs';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), latidoAutoSeoPlugin()],
   server: {
     port: 5173,
     host: true
   },
   build: {
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        // Separación por dominio: /f/:token nunca descarga Framer Motion, QR generator ni iconos del panel
+        // Separación por dominio: /f/:token nunca descarga Framer Motion, Supabase SDK, QR generator ni iconos del panel
         manualChunks(id) {
           if (!id.includes('node_modules')) return undefined;
           if (id.includes('@supabase/')) return 'supabase';

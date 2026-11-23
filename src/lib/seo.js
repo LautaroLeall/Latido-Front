@@ -1,33 +1,40 @@
 import { useEffect } from 'react';
+import {
+  SITE_URL,
+  DEFAULT_TITLE,
+  DEFAULT_DESC,
+  DEFAULT_KEYWORDS,
+  INDEX_ROBOTS,
+  NOINDEX_ROBOTS,
+  SEO_ROUTES,
+  resolveSeoForPath,
+  applySeoTags
+} from './seoConfig';
 
-const DEFAULT_TITLE = 'Latido — Cada opinión, a tiempo.';
-const DEFAULT_DESC =
-  'Plataforma física y digital con QR y chip NFC para recibir opiniones en 30 segundos, impulsar reseñas en Google y rescatar clientes insatisfechos en tiempo real.';
-
-function upsertMeta(attr, key, content) {
-  let el = document.head.querySelector(`meta[${attr}="${key}"]`);
-  if (!el) {
-    el = document.createElement('meta');
-    el.setAttribute(attr, key);
-    document.head.appendChild(el);
-  }
-  el.setAttribute('content', content);
-}
+export {
+  SITE_URL,
+  DEFAULT_TITLE,
+  DEFAULT_DESC,
+  DEFAULT_KEYWORDS,
+  INDEX_ROBOTS,
+  NOINDEX_ROBOTS,
+  SEO_ROUTES,
+  resolveSeoForPath,
+  applySeoTags
+};
 
 /**
- * Actualiza título, descripción y directiva robots (`noindex` para paneles y tickets privados).
+ * Override dinámico para vistas cuyo título/descripción depende de datos cargados
+ * (ej. nombre del negocio en `/f/:token` o `/admin`).
  */
-export function usePageMeta({ title = DEFAULT_TITLE, description = DEFAULT_DESC, noindex = false } = {}) {
+export function usePageMeta({ title, description, noindex, canonical } = {}) {
   useEffect(() => {
-    document.title = title;
-    upsertMeta('name', 'description', description);
-    upsertMeta('property', 'og:title', title);
-    upsertMeta('property', 'og:description', description);
-    upsertMeta('name', 'robots', noindex ? 'noindex, nofollow' : 'index, follow');
-
-    return () => {
-      document.title = DEFAULT_TITLE;
-      upsertMeta('name', 'robots', 'index, follow');
-    };
-  }, [title, description, noindex]);
+    const robots = typeof noindex === 'boolean' ? (noindex ? NOINDEX_ROBOTS : INDEX_ROBOTS) : INDEX_ROBOTS;
+    applySeoTags({
+      title: title || DEFAULT_TITLE,
+      description: description || DEFAULT_DESC,
+      canonical,
+      robots
+    });
+  }, [title, description, noindex, canonical]);
 }

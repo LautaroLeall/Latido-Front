@@ -1,6 +1,5 @@
 import React from 'react';
 import { MotionConfig } from 'framer-motion';
-import { usePageMeta } from '../../lib/seo';
 import LandingNav from './LandingNav';
 import LandingHero from './LandingHero';
 import LandingStats from './LandingStats';
@@ -17,13 +16,6 @@ import LandingCTA from './LandingCTA';
  * MotionConfig respeta `prefers-reduced-motion` del sistema en todas las animaciones.
  */
 export default function Landing() {
-  usePageMeta({
-    title: 'Latido — Cada opinión, a tiempo.',
-    description:
-      'Tus clientes opinan en 30 segundos escaneando un QR o acercando el celular al chip NFC. Panel en tiempo real, destino Google y Modo Rescate.',
-    noindex: false
-  });
-
   return (
     <MotionConfig reducedMotion="user">
       <div className="min-h-screen overflow-x-hidden">

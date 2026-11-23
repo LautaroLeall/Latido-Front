@@ -60,8 +60,9 @@ export default function FeedbackView() {
   };
 
   // ── Cargar datos públicos del negocio ──────────────────────────────────────
-  const loadBusiness = useCallback(async () => {
+  const loadBusiness = useCallback(async (signal) => {
     setLoadState('loading');
+    setBusiness(null);
     if (isDemo) {
       setBusiness(DEMO_BUSINESS);
       setLoadState('ready');
@@ -72,7 +73,8 @@ export default function FeedbackView() {
       return;
     }
     try {
-      const { data, error } = await callPublicRpc('get_business_by_token', { p_token: token });
+      const { data, error } = await callPublicRpc('get_business_by_token', { p_token: token }, { signal });
+      if (signal?.aborted) return;
       if (error) throw error;
       if (!data?.token_valid) {
         setLoadState('invalid');
@@ -81,18 +83,36 @@ export default function FeedbackView() {
       setBusiness(data);
       setLoadState('ready');
     } catch (err) {
+      if (signal?.aborted) return;
       console.error('[LATIDO] Error cargando negocio por token:', err);
       setLoadState('error');
     }
   }, [token, isDemo]);
 
-  useEffect(() => { loadBusiness(); }, [loadBusiness]);
+  useEffect(() => {
+    // Reinicia el formulario si cambia el token en la URL sin desmontar el componente
+    setForm(INITIAL_FORM);
+    setErrors([]);
+    setFieldErrors({});
+    setSubmitted(false);
+    setGoogleDeclined(false);
+
+    const ctrl = new AbortController();
+    loadBusiness(ctrl.signal);
+    return () => ctrl.abort();
+  }, [loadBusiness]);
 
   usePageMeta({
-    title: business?.business_name ? `${business.business_name} · Tu opinión` : 'Ticket de opinión · Latido',
-    description: business?.business_name
-      ? `Contanos en 30 segundos cómo fue tu experiencia en ${business.business_name}.`
-      : 'Dejá tu opinión en 30 segundos.',
+    title: isDemo
+      ? 'Probá el Ticket de Opinión QR y NFC en Vivo | Latido'
+      : business?.business_name
+        ? `${business.business_name} · Tu opinión`
+        : 'Ticket de opinión · Latido',
+    description: isDemo
+      ? 'Probá en vivo el ticket digital QR y NFC de Latido sin registrarte: calificá en 30 segundos, elegí aspectos y descubrí el flujo de Google y Modo Rescate.'
+      : business?.business_name
+        ? `Contanos en 30 segundos cómo fue tu experiencia en ${business.business_name}.`
+        : 'Dejá tu opinión en 30 segundos.',
     noindex: !isDemo
   });
 
@@ -298,7 +318,7 @@ export default function FeedbackView() {
         <h1 className="text-xl font-bold mt-4 tracking-tight">No pudimos cargar el ticket</h1>
         <p className="text-muted text-sm mt-2">Revisá tu conexión a internet y probá de nuevo.</p>
         {loadState === 'error' && (
-          <HardButton className="mt-5" size="sm" onClick={loadBusiness}>Reintentar</HardButton>
+          <HardButton className="mt-5" size="sm" onClick={() => loadBusiness()}>Reintentar</HardButton>
         )}
       </TicketCard>
     );

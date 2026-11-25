@@ -1,14 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { Mail, MessageCircle, Copy, Check } from 'lucide-react';
 import Field from '../../components/ui/Field';
 import Alert from '../../components/ui/Alert';
 import HardButton from '../../components/ui/HardButton';
-import Stamp from '../../components/ui/Stamp';
 import PasswordChecklist from '../../components/ui/PasswordChecklist';
 import { supabase } from '../../lib/supabaseClient';
-import { getErrorMessage } from '../../lib/errors';
-import { buildFeedbackUrl } from '../../lib/utils';
-import { buildGmailUrl, buildMailUrl } from '../../lib/contact';
+import { buildKitUrl } from '../../lib/utils';
+import { SITE_URL } from '../../lib/seoConfig';
 import {
   validateBranchName,
   validateBusinessName,
@@ -18,76 +15,20 @@ import {
   validatePersonName,
   validatePhone
 } from '../../lib/validators';
+import {
+  defaultPlanId,
+  extractFunctionError,
+  generatePassword,
+  initialForm
+} from './create/createBusinessHelpers';
+import BusinessCreatedCard from './create/BusinessCreatedCard';
 
-const PASS_UPPER = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-const PASS_LOWER = 'abcdefghjkmnpqrstuvwxyz';
-const PASS_DIGITS = '23456789';
-const PASS_ALL = PASS_UPPER + PASS_LOWER + PASS_DIGITS;
-
-function generatePassword(length = 12) {
-  const bytes = new Uint8Array(length);
-  crypto.getRandomValues(bytes);
-  const chars = [
-    PASS_UPPER[bytes[0] % PASS_UPPER.length],
-    PASS_LOWER[bytes[1] % PASS_LOWER.length],
-    PASS_DIGITS[bytes[2] % PASS_DIGITS.length],
-    PASS_DIGITS[bytes[3] % PASS_DIGITS.length]
-  ];
-  for (let i = 4; i < length; i++) {
-    chars.push(PASS_ALL[bytes[i] % PASS_ALL.length]);
-  }
-  // Mezclar posiciones
-  for (let i = chars.length - 1; i > 0; i--) {
-    const j = bytes[i] % (i + 1);
-    [chars[i], chars[j]] = [chars[j], chars[i]];
-  }
-  return chars.join('');
-}
-
-function getAppBaseUrl() {
-  return (import.meta.env.VITE_APP_URL || window.location.origin).replace(/\/+$/, '');
-}
-
-async function extractFunctionError(error) {
-  if (error?.context && typeof error.context.json === 'function') {
-    try {
-      const body = await error.context.json();
-      if (body?.error) return body.error;
-    } catch {
-      // Sin cuerpo JSON legible
-    }
-  }
-  if (/failed to send a request to the edge function/i.test(error?.message || '')) {
-    return 'No pudimos conectar con la función create-business-account. Verificá que esté desplegada en Supabase.';
-  }
-  return getErrorMessage(error, 'No pudimos crear la cuenta del negocio.');
-}
-
-function defaultPlanId(plans) {
-  return (plans.find(p => p.code === 'base') || plans[0])?.id || '';
-}
-
-function initialForm(plans) {
-  return {
-    businessName: '',
-    branchName: 'Casa central',
-    managerName: '',
-    planId: defaultPlanId(plans),
-    supportsOverride: '1',
-    ownerName: '',
-    ownerPhone: '',
-    email: '',
-    password: generatePassword()
-  };
-}
-
-export default function CreateBusinessForm({ plans, onCreated, onClose }) {
+export default function CreateBusinessForm({ plans, onCreated, onClose, onOpenKits }) {
   const [form, setForm] = useState(() => initialForm(plans));
   const [showPassword, setShowPassword] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [created, setCreated] = useState(null);
-  const [copied, setCopied] = useState(false);
 
   const activePlanId = form.planId || defaultPlanId(plans);
   const selectedPlan = useMemo(
@@ -149,9 +90,7 @@ export default function CreateBusinessForm({ plans, onCreated, onClose }) {
         }
       });
 
-      if (fnErr) {
-        throw new Error(await extractFunctionError(fnErr));
-      }
+      if (fnErr) throw new Error(await extractFunctionError(fnErr));
       if (!data?.business_id || !data?.token) {
         throw new Error('La función respondió sin los datos del negocio creado.');
       }
@@ -170,8 +109,8 @@ export default function CreateBusinessForm({ plans, onCreated, onClose }) {
         email: data.email || emailRes.value,
         password: passRes.value,
         token: data.token,
-        loginUrl: `${getAppBaseUrl()}/login`,
-        ticketUrl: buildFeedbackUrl(data.token)
+        loginUrl: `${SITE_URL}/login`,
+        ticketUrl: buildKitUrl(data.token)
       });
       await onCreated();
     } catch (err) {
@@ -181,116 +120,25 @@ export default function CreateBusinessForm({ plans, onCreated, onClose }) {
     }
   }
 
-  function buildHandoffText(c) {
-    return [
-      `Hola ${c.ownerName.split(/\s+/)[0]}, ¡bienvenido/a a Latido!`,
-      `Ya está activa la cuenta de ${c.businessName} (${c.planName} · ${c.supportsLabel}).`,
-      '',
-      `Ingreso al panel: ${c.loginUrl}`,
-      `Email: ${c.email}`,
-      `Contraseña inicial: ${c.password}`,
-      '',
-      `Primer ticket (${c.branchName}): ${c.ticketUrl}`,
-      '',
-      'Cuando ingreses podés subir el logo de tu negocio, personalizar las preguntas del formulario y cambiar tu contraseña desde "Mi cuenta".'
-    ].join('\n');
-  }
-
-  async function copyCredentials() {
-    if (!created) return;
-    try {
-      await navigator.clipboard.writeText(buildHandoffText(created));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {
-      setError('No pudimos copiar al portapapeles. Seleccioná los datos manualmente.');
-    }
-  }
-
   function resetForAnother() {
     setCreated(null);
-    setCopied(false);
     setError('');
     setForm(initialForm(plans));
   }
 
   if (created) {
-    const handoffText = buildHandoffText(created);
-    const subject = `Tus accesos a Latido · ${created.businessName}`;
-    const waHref = created.ownerPhone
-      ? `https://wa.me/${created.ownerPhone}?text=${encodeURIComponent(handoffText)}`
-      : `https://wa.me/?text=${encodeURIComponent(handoffText)}`;
-    const gmailHref = buildGmailUrl(subject, handoffText, created.email);
-    const mailHref = buildMailUrl(subject, handoffText, created.email);
-
     return (
-      <div className="border-[1.5px] border-teal bg-paper p-5 shadow-[4px_4px_0_#1F6F64]">
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-dashed border-line-gray">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <Stamp variant="teal">NEGOCIO CREADO</Stamp>
-            <h3 className="font-bold text-lg">{created.businessName}</h3>
-          </div>
-          <span className="font-mono text-xs text-muted">
-            {created.planName} ({created.supportsLabel}) · {created.branchName}
-          </span>
-        </div>
-
-        <p className="text-sm text-ink/80 mb-4">
-          La cuenta ya está confirmada y lista para iniciar sesión en <code className="font-mono bg-paper-dim px-1">/login</code>.
-          Enviá la invitación con las credenciales ahora: se abre siempre en una pestaña nueva para que no salgas del panel.
-        </p>
-
-        <dl className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 bg-paper-dim border border-line-gray p-4 font-mono text-xs mb-5">
-          <div>
-            <dt className="text-muted uppercase text-[10px]">Acceso al panel</dt>
-            <dd className="mt-0.5 break-all">{created.loginUrl}</dd>
-          </div>
-          <div>
-            <dt className="text-muted uppercase text-[10px]">Email ({created.ownerName})</dt>
-            <dd className="mt-0.5 font-bold break-all">{created.email}</dd>
-          </div>
-          <div>
-            <dt className="text-muted uppercase text-[10px]">Contraseña inicial</dt>
-            <dd className="mt-0.5 font-bold text-amber-ink select-all">{created.password}</dd>
-          </div>
-          <div>
-            <dt className="text-muted uppercase text-[10px]">Primer soporte (QR / NFC)</dt>
-            <dd className="mt-0.5 break-all">
-              <a href={created.ticketUrl} target="_blank" rel="noopener noreferrer" className="text-teal underline">
-                {created.ticketUrl}
-              </a>
-            </dd>
-          </div>
-        </dl>
-
-        <div className="flex flex-wrap gap-2">
-          <HardButton as="a" size="sm" variant="teal" href={waHref} target="_blank" rel="noopener noreferrer">
-            <MessageCircle size={14} /> Enviar por WhatsApp
-          </HardButton>
-          <HardButton as="a" size="sm" variant="primary" href={gmailHref} target="_blank" rel="noopener noreferrer">
-            <Mail size={14} /> Enviar por Gmail
-          </HardButton>
-          <HardButton as="a" size="sm" variant="secondary" href={mailHref} target="_blank" rel="noopener noreferrer">
-            <Mail size={14} /> Abrir app de correo
-          </HardButton>
-          <HardButton size="sm" variant="secondary" onClick={copyCredentials}>
-            {copied ? <><Check size={14} /> Datos copiados</> : <><Copy size={14} /> Copiar invitación</>}
-          </HardButton>
-          <HardButton size="sm" variant="secondary" onClick={resetForAnother}>
-            + Crear otro negocio
-          </HardButton>
-          {onClose && (
-            <HardButton size="sm" variant="secondary" onClick={onClose}>
-              Ver negocios
-            </HardButton>
-          )}
-        </div>
-      </div>
+      <BusinessCreatedCard
+        created={created}
+        onReset={resetForAnother}
+        onClose={onClose}
+        onOpenKits={onOpenKits}
+      />
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border-[1.5px] border-ink bg-paper p-5 shadow-hard-line space-y-5" noValidate>
+    <form onSubmit={handleSubmit} className="border-[1.5px] border-ink bg-paper p-4 sm:p-5 shadow-hard-line space-y-5 min-w-0" noValidate>
       <div className="flex items-center justify-between gap-3 pb-3 border-b border-line-gray">
         <div>
           <h2 className="font-bold text-lg">Alta de nuevo negocio</h2>
@@ -325,13 +173,7 @@ export default function CreateBusinessForm({ plans, onCreated, onClose }) {
             placeholder="Casa central"
             maxLength={60}
           />
-          <Field
-            id="new-plan"
-            label="Plan"
-            as="select"
-            value={activePlanId}
-            onChange={set('planId')}
-          >
+          <Field id="new-plan" label="Plan" as="select" value={activePlanId} onChange={set('planId')}>
             {plans.map(p => (
               <option key={p.id} value={p.id}>
                 {p.name} {p.is_custom ? '(a medida)' : `(${p.supports} ${p.supports === 1 ? 'soporte' : 'soportes'})`}
@@ -396,6 +238,7 @@ export default function CreateBusinessForm({ plans, onCreated, onClose }) {
             id="new-owner-email"
             label="Email de acceso"
             type="email"
+            inputMode="email"
             value={form.email}
             onChange={set('email')}
             placeholder="dueno@negocio.com"
@@ -406,6 +249,7 @@ export default function CreateBusinessForm({ plans, onCreated, onClose }) {
             id="new-owner-phone"
             label="WhatsApp del dueño (opcional)"
             type="tel"
+            inputMode="tel"
             value={form.ownerPhone}
             onChange={set('ownerPhone')}
             placeholder="Ej: 381 555 1234"

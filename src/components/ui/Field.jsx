@@ -15,13 +15,15 @@ export default function Field({
   ...props
 }) {
   const Component = as;
+  const isSelect = as === 'select';
   const base =
-    'w-full bg-paper border-[1.5px] p-2.5 text-sm rounded-none outline-none transition-shadow ' +
-    'focus:border-teal focus:shadow-[2px_2px_0px_#1F6F64] disabled:opacity-60 disabled:cursor-not-allowed';
+    'w-full max-w-full min-w-0 min-h-[44px] bg-paper text-ink border-[1.5px] px-3 py-2.5 text-base sm:text-sm rounded-none outline-none transition-shadow ' +
+    'focus:border-teal focus:shadow-[2px_2px_0px_#1F6F64] disabled:opacity-60 disabled:cursor-not-allowed' +
+    (isSelect ? ' cursor-pointer' : '');
   const border = error ? 'border-alert-red' : 'border-ink';
 
   return (
-    <div className={className}>
+    <div className={`min-w-0 ${className}`}>
       {label && (
         <label htmlFor={id} className="block font-mono text-[11px] uppercase tracking-wider text-muted mb-1">
           {label}

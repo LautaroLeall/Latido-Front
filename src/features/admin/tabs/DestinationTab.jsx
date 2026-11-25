@@ -119,7 +119,7 @@ export default function DestinationTab({ business, isAdmin, onSaved }) {
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-6 items-start">
-      <form onSubmit={handleSave} className="bg-paper p-5 border border-line-gray shadow-hard-line space-y-5" noValidate>
+      <form onSubmit={handleSave} className="bg-paper p-4 sm:p-5 border border-line-gray shadow-hard-line space-y-5 min-w-0" noValidate>
         <div>
           <h2 className="text-lg font-bold">Destino de las reseñas</h2>
           <p className="text-sm text-muted mt-0.5">

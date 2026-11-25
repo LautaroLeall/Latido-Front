@@ -1,27 +1,45 @@
 import React, { useState } from 'react';
-import Stamp from '../../../components/ui/Stamp';
 import HardButton from '../../../components/ui/HardButton';
 import Alert from '../../../components/ui/Alert';
-import { StatCard, StarsText, EmptyState, SectionLabel } from '../components/PanelBits';
+import { StatCard, EmptyState, SectionLabel } from '../components/PanelBits';
 import { useBusinessStats, useRecentResponses } from '../useAdminData';
-import { formatRelative, CHANNEL_LABELS } from '../../../lib/utils';
 import { getErrorMessage } from '../../../lib/errors';
+import ResponseCard from './ResponseCard';
 
 const PERIODS = [
-  { days: 7, label: '7 días' },
-  { days: 30, label: '30 días' },
-  { days: 90, label: '90 días' }
+  {
+    days: 7,
+    label: '7 días'
+  },
+  {
+    days: 30,
+    label: '30 días'
+  },
+  {
+    days: 90,
+    label: '90 días'
+  }
 ];
 
-export default function ResultsTab({ businessId, refreshKey, openCasesCount, now }) {
+export default function ResultsTab({ business, businessId, refreshKey, openCasesCount, now }) {
   const [days, setDays] = useState(7);
-  const stats = useBusinessStats(businessId, days, refreshKey);
-  const responses = useRecentResponses(businessId, refreshKey);
+  const [opinionFilter, setOpinionFilter] = useState('all'); // all | contact | high | low
+  const activeBusinessId = business?.id || businessId;
+  const stats = useBusinessStats(activeBusinessId, days, refreshKey);
+  const responses = useRecentResponses(activeBusinessId, refreshKey);
 
   const s = stats.data;
   const total = s?.total ?? 0;
   const distribution = s?.distribution ?? {};
   const topTags = Object.entries(s?.tags ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  const withContactCount = responses.items.filter(r => !!r.contact).length;
+  const filteredResponses = responses.items.filter(r => {
+    if (opinionFilter === 'contact') return !!r.contact;
+    if (opinionFilter === 'high') return r.stars >= 4;
+    if (opinionFilter === 'low') return r.stars <= 2;
+    return true;
+  });
 
   return (
     <div className="space-y-6">
@@ -68,22 +86,22 @@ export default function ResultsTab({ businessId, refreshKey, openCasesCount, now
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="w-14 text-right text-muted">{count} · {pct}%</span>
+                    <span className="min-w-[68px] shrink-0 text-right text-muted tabular-nums whitespace-nowrap">{count} · {pct}%</span>
                   </div>
                 );
               })}
             </div>
           </div>
-          <div className="bg-paper border border-line-gray p-4">
+          <div className="bg-paper border border-line-gray p-4 min-w-0">
             <SectionLabel>Aspectos más mencionados</SectionLabel>
             {topTags.length === 0 ? (
               <p className="text-sm text-muted">Todavía no hay etiquetas en este período.</p>
             ) : (
               <ul className="space-y-1.5">
                 {topTags.map(([tag, count]) => (
-                  <li key={tag} className="flex justify-between font-mono text-sm border-b border-dashed border-line-gray pb-1">
-                    <span>#{tag}</span>
-                    <strong>{count}</strong>
+                  <li key={tag} className="flex justify-between gap-2 font-mono text-sm border-b border-dashed border-line-gray pb-1">
+                    <span className="truncate">#{tag}</span>
+                    <strong className="shrink-0 tabular-nums">{count}</strong>
                   </li>
                 ))}
               </ul>
@@ -94,7 +112,33 @@ export default function ResultsTab({ businessId, refreshKey, openCasesCount, now
 
       {/* Últimas opiniones */}
       <div>
-        <SectionLabel>Últimas opiniones</SectionLabel>
+        <SectionLabel
+          right={responses.items.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { id: 'all', label: `Todas (${responses.items.length})` },
+                { id: 'contact', label: `Con contacto (${withContactCount})` },
+                { id: 'high', label: 'Positivas (4–5★)' },
+                { id: 'low', label: 'Bajas (≤ 2★)' }
+              ].map(f => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setOpinionFilter(f.id)}
+                  aria-pressed={opinionFilter === f.id}
+                  className={`font-mono text-[11px] px-2.5 py-1 border cursor-pointer transition-colors ${opinionFilter === f.id
+                    ? 'bg-ink text-paper border-ink font-bold'
+                    : 'bg-paper text-muted border-line-gray hover:border-ink hover:text-ink'
+                    }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          )}
+        >
+          Últimas opiniones
+        </SectionLabel>
 
         {responses.error && (
           <Alert variant="error" className="mb-3">{getErrorMessage(responses.error, 'No pudimos cargar las opiniones.')}</Alert>
@@ -106,44 +150,17 @@ export default function ResultsTab({ businessId, refreshKey, openCasesCount, now
           </div>
         ) : responses.items.length === 0 ? (
           <EmptyState title="Todavía no recibiste opiniones">
-            Imprimí tu QR desde la pestaña “Mis QR &amp; NFC” y ponelo en el mostrador.
+            Apoyá tu soporte físico QR + NFC en el mostrador y las opiniones van a aparecer acá al instante.
+          </EmptyState>
+        ) : filteredResponses.length === 0 ? (
+          <EmptyState title="No hay opiniones con este filtro">
+            Probá con otro filtro o cargá más opiniones.
           </EmptyState>
         ) : (
           <div className="space-y-4">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-              {responses.items.map(resp => (
-                <article
-                  key={resp.id}
-                  className={`p-4 bg-paper border border-line-gray border-l-4 animate-fadeIn flex flex-col justify-between ${resp.stars <= 2 ? 'border-l-alert-red' : resp.stars === 3 ? 'border-l-amber' : 'border-l-teal'
-                    }`}
-                >
-                  <div>
-                    <div className="flex justify-between items-start gap-2 flex-wrap">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <StarsText value={resp.stars} />
-                        <span className="font-mono text-xs text-muted">
-                          {formatRelative(resp.created_at, now)}
-                          {resp.branch?.name ? ` · ${resp.branch.name}` : ''}
-                        </span>
-                      </div>
-                      {resp.contact ? <Stamp variant="amber">Dejó contacto</Stamp> : <Stamp variant="ink">Anónimo</Stamp>}
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed break-words">
-                      {resp.comment ? `“${resp.comment}”` : <span className="text-muted italic">Sin comentario</span>}
-                    </p>
-                    {resp.tags?.length > 0 && (
-                      <div className="flex flex-wrap gap-x-2 gap-y-1 mt-2">
-                        {resp.tags.map(t => <span key={t} className="font-mono text-xs text-muted">#{t}</span>)}
-                      </div>
-                    )}
-                  </div>
-                  {resp.contact && (
-                    <div className="mt-2.5 pt-2 border-t border-dashed border-line-gray font-mono text-xs text-muted flex flex-wrap gap-x-3 gap-y-1">
-                      <span>Cliente: <strong className="text-ink">{resp.contact.full_name}</strong></span>
-                      <span>Canal: <strong className="text-ink">{CHANNEL_LABELS[resp.contact.preferred_channel] || resp.contact.preferred_channel}</strong></span>
-                    </div>
-                  )}
-                </article>
+              {filteredResponses.map(resp => (
+                <ResponseCard key={resp.id} resp={resp} business={business} now={now} />
               ))}
             </div>
 

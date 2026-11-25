@@ -3,7 +3,7 @@ import React from 'react';
 /**
  * Tarjeta de métrica del panel (número grande + etiqueta mono)
  */
-export function StatCard({ label, value, suffix, tone = 'ink', badge, loading = false }) {
+export function StatCard({ label, value, suffix, tone = 'ink', badge, footer, loading = false }) {
   const tones = {
     ink: 'text-ink',
     teal: 'text-teal',
@@ -11,17 +11,20 @@ export function StatCard({ label, value, suffix, tone = 'ink', badge, loading = 
     amber: 'text-amber-ink'
   };
   return (
-    <div className="bg-paper border border-line-gray p-4 shadow-hard-line min-w-0">
-      <div className="flex items-center gap-1.5 flex-wrap">
-        <span className="font-mono text-muted text-[11px] uppercase tracking-wider">{label}</span>
-        {badge && (
-          <span className="bg-amber/20 text-amber-ink font-mono text-[9px] px-1 font-bold">{badge}</span>
-        )}
+    <div className="bg-paper border border-line-gray p-3.5 sm:p-4 shadow-hard-line min-w-0 flex flex-col justify-between">
+      <div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-mono text-muted text-[10.5px] sm:text-[11px] uppercase tracking-wider leading-tight">{label}</span>
+          {badge && (
+            <span className="bg-amber/20 text-amber-ink font-mono text-[9px] px-1 font-bold">{badge}</span>
+          )}
+        </div>
+        <div className={`text-2xl sm:text-3xl font-bold tracking-tight mt-1 truncate tabular-nums ${tones[tone] || tones.ink}`}>
+          {loading ? <span className="inline-block w-12 h-7 bg-paper-dim animate-pulse align-middle" /> : value}
+          {!loading && suffix && <small className="text-xs sm:text-sm text-muted font-normal ml-1">{suffix}</small>}
+        </div>
       </div>
-      <div className={`text-3xl font-bold tracking-tight mt-1 truncate ${tones[tone] || tones.ink}`}>
-        {loading ? <span className="inline-block w-12 h-7 bg-paper-dim animate-pulse align-middle" /> : value}
-        {!loading && suffix && <small className="text-sm text-muted font-normal ml-1">{suffix}</small>}
-      </div>
+      {!loading && footer && <div className="mt-2 pt-1.5 border-t border-dashed border-line-gray/80">{footer}</div>}
     </div>
   );
 }
@@ -55,7 +58,7 @@ export function EmptyState({ title, children }) {
  */
 export function SectionLabel({ children, right }) {
   return (
-    <div className="flex items-center justify-between gap-3 mb-3">
+    <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
       <span className="font-mono text-muted text-xs uppercase tracking-wider">{children}</span>
       {right}
     </div>

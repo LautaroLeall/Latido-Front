@@ -13,14 +13,15 @@ const PAGE_SIZE = 20;
 const RESPONSE_SELECT = `
   id, stars, tags, comment, created_at,
   branch:branches!responses_branch_id_fkey(name),
-  contact:response_contacts!response_contacts_response_id_fkey(full_name, preferred_channel, status)
+  contact:response_contacts!response_contacts_response_id_fkey(full_name, email, phone, preferred_channel, status)
 `;
 
 const CASE_SELECT = `
   id, status, stars_snapshot, created_at, sla_due_at, first_contacted_at, contact_channel,
   message_sent, outcome, resolved_at, recovered_value, avg_ticket_snapshot, resolution_note,
   response:responses!rescue_cases_response_id_fkey(comment, tags, created_at, branch:branches!responses_branch_id_fkey(name)),
-  contact:response_contacts!rescue_cases_contact_id_fkey(id, full_name, email, phone, preferred_channel)
+  contact:response_contacts!rescue_cases_contact_id_fkey(id, full_name, email, phone, preferred_channel),
+  resolver:profiles!rescue_cases_resolved_by_fkey(full_name)
 `;
 
 // PostgREST puede devolver un embed 1:1 como objeto o como array según la versión
@@ -173,6 +174,7 @@ export function useRescueCases(businessId, refreshKey) {
         supabase.from('rescue_cases').select(CASE_SELECT)
           .eq('business_id', businessId)
           .in('status', ['resolved', 'dismissed'])
+          .order('resolved_at', { ascending: false, nullsFirst: false })
           .order('created_at', { ascending: false })
           .limit(50),
         supabase.from('rescue_metrics').select('*').eq('business_id', businessId)
@@ -187,7 +189,8 @@ export function useRescueCases(businessId, refreshKey) {
         return {
           ...c,
           response: response ? { ...response, branch: one(response.branch) } : null,
-          contact: one(c.contact)
+          contact: one(c.contact),
+          resolver: one(c.resolver)
         };
       });
 

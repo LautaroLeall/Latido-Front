@@ -73,7 +73,7 @@ function PlanRow({ plan, onChanged }) {
     }
   }
 
-  const cell = 'bg-paper border border-line-gray p-1.5 text-sm rounded-none w-full focus:border-teal outline-none';
+  const cell = 'bg-paper text-ink border-[1.5px] border-line-gray px-2.5 py-2 min-h-[42px] sm:min-h-[38px] text-base sm:text-sm rounded-none w-full min-w-0 focus:border-teal outline-none';
 
   return (
     <div className={`border border-line-gray p-4 bg-paper ${form.active ? '' : 'opacity-70'}`}>
@@ -83,24 +83,24 @@ function PlanRow({ plan, onChanged }) {
         {!form.active && <Stamp variant="ink">Oculto</Stamp>}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 items-end">
-        <label className="col-span-2 font-mono text-[10px] uppercase text-muted">Nombre
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3 items-end">
+        <label className="sm:col-span-2 font-mono text-[10px] uppercase text-muted min-w-0">Nombre
           <input className={cell} value={form.name} maxLength={40} onChange={set('name')} />
         </label>
-        <label className="font-mono text-[10px] uppercase text-muted">Soportes
-          <input className={cell} type="number" min="1" value={form.supports} disabled={form.is_custom}
+        <label className="font-mono text-[10px] uppercase text-muted min-w-0">Soportes
+          <input className={cell} type="number" inputMode="numeric" min="1" value={form.supports} disabled={form.is_custom}
             placeholder={form.is_custom ? '—' : ''} onChange={set('supports')} />
         </label>
-        <label className="font-mono text-[10px] uppercase text-muted">Precio / mes (ARS)
-          <input className={cell} type="number" min="0" step="1000" value={form.price_monthly} disabled={form.is_custom}
+        <label className="font-mono text-[10px] uppercase text-muted min-w-0">Precio / mes (ARS)
+          <input className={cell} type="number" inputMode="numeric" min="0" step="1000" value={form.price_monthly} disabled={form.is_custom}
             placeholder={form.is_custom ? 'WhatsApp' : ''} onChange={set('price_monthly')} />
         </label>
-        <label className="font-mono text-[10px] uppercase text-muted">Orden
-          <input className={cell} type="number" value={form.sort_order} onChange={set('sort_order')} />
+        <label className="font-mono text-[10px] uppercase text-muted min-w-0">Orden
+          <input className={cell} type="number" inputMode="numeric" value={form.sort_order} onChange={set('sort_order')} />
         </label>
-        <div className="flex flex-col gap-1 font-mono text-[11px]">
-          <label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={form.active} onChange={set('active')} /> Visible</label>
-          <label className="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" checked={form.highlighted} onChange={set('highlighted')} /> Destacado</label>
+        <div className="flex sm:flex-col gap-3 sm:gap-1 font-mono text-xs sm:text-[11px]">
+          <label className="flex items-center gap-1.5 cursor-pointer py-1"><input type="checkbox" checked={form.active} onChange={set('active')} className="w-4 h-4 accent-teal" /> Visible</label>
+          <label className="flex items-center gap-1.5 cursor-pointer py-1"><input type="checkbox" checked={form.highlighted} onChange={set('highlighted')} className="w-4 h-4 accent-teal" /> Destacado</label>
         </div>
       </div>
 
@@ -156,18 +156,18 @@ export default function PlansManager({ plans, onChanged }) {
       {open ? (
         <form onSubmit={create} className="border border-dashed border-ink p-4 bg-paper space-y-3">
           <h3 className="font-bold">Nuevo plan</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <label className="font-mono text-[10px] uppercase text-muted">Código
-              <input className="bg-paper border border-line-gray p-1.5 text-sm rounded-none w-full" value={form.code} onChange={set('code')} placeholder="ej: pro10" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            <label className="font-mono text-[10px] uppercase text-muted min-w-0">Código
+              <input className="bg-paper text-ink border-[1.5px] border-line-gray px-2.5 py-2 min-h-[42px] sm:min-h-[38px] text-base sm:text-sm rounded-none w-full min-w-0 focus:border-teal outline-none" value={form.code} onChange={set('code')} placeholder="ej: pro10" />
             </label>
-            <label className="font-mono text-[10px] uppercase text-muted">Nombre
-              <input className="bg-paper border border-line-gray p-1.5 text-sm rounded-none w-full" value={form.name} maxLength={40} onChange={set('name')} />
+            <label className="font-mono text-[10px] uppercase text-muted min-w-0">Nombre
+              <input className="bg-paper text-ink border-[1.5px] border-line-gray px-2.5 py-2 min-h-[42px] sm:min-h-[38px] text-base sm:text-sm rounded-none w-full min-w-0 focus:border-teal outline-none" value={form.name} maxLength={40} onChange={set('name')} />
             </label>
-            <label className="font-mono text-[10px] uppercase text-muted">Soportes
-              <input className="bg-paper border border-line-gray p-1.5 text-sm rounded-none w-full" type="number" min="1" value={form.supports} disabled={form.is_custom} onChange={set('supports')} />
+            <label className="font-mono text-[10px] uppercase text-muted min-w-0">Soportes
+              <input className="bg-paper text-ink border-[1.5px] border-line-gray px-2.5 py-2 min-h-[42px] sm:min-h-[38px] text-base sm:text-sm rounded-none w-full min-w-0 focus:border-teal outline-none" type="number" inputMode="numeric" min="1" value={form.supports} disabled={form.is_custom} onChange={set('supports')} />
             </label>
-            <label className="font-mono text-[10px] uppercase text-muted">Precio / mes
-              <input className="bg-paper border border-line-gray p-1.5 text-sm rounded-none w-full" type="number" min="0" value={form.price_monthly} disabled={form.is_custom} onChange={set('price_monthly')} />
+            <label className="font-mono text-[10px] uppercase text-muted min-w-0">Precio / mes
+              <input className="bg-paper text-ink border-[1.5px] border-line-gray px-2.5 py-2 min-h-[42px] sm:min-h-[38px] text-base sm:text-sm rounded-none w-full min-w-0 focus:border-teal outline-none" type="number" inputMode="numeric" min="0" value={form.price_monthly} disabled={form.is_custom} onChange={set('price_monthly')} />
             </label>
           </div>
           <label className="flex items-center gap-2 font-mono text-xs cursor-pointer">

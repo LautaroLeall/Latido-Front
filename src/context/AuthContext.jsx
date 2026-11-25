@@ -127,10 +127,33 @@ export function AuthProvider({ children }) {
   }, []);
 
   const sendPasswordReset = useCallback(async (email) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1) Validar en el servidor que exista un negocio activo o un Super Admin con ese email
+    const { data: check, error: checkError } = await supabase.rpc('check_recovery_account', {
+      p_email: cleanEmail
+    });
+
+    if (checkError) {
+      if (
+        checkError.code === 'PGRST202' ||
+        /check_recovery_account|could not find the function/i.test(checkError.message || '')
+      ) {
+        throw new Error('Falta aplicar la migración 013 de verificación de recuperación en Supabase.');
+      }
+      throw checkError;
+    }
+
+    if (!check?.eligible) {
+      return { sent: false, reason: check?.reason || 'not_found' };
+    }
+
+    // 2) Solo cuando la cuenta existe y está habilitada se solicita el envío del correo
+    const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
       redirectTo: `${window.location.origin}/reset-password`
     });
     if (error) throw error;
+    return { sent: true, reason: 'ok' };
   }, []);
 
   const updatePassword = useCallback(async (password) => {

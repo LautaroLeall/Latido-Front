@@ -1,22 +1,22 @@
 # Latido — Cada opinión, a tiempo. (https://latido-opinion.vercel.app)
-> Última actualización: 2026-11-23
+> Última actualización: 2026-11-25
 > Plataforma SaaS física y digital con soportes QR + chip NFC para recibir opiniones de clientes en 30 segundos, impulsar reseñas en Google Maps y activar Modo Rescate en tiempo real.
 
 ## Qué es Latido
-Latido conecta el mostrador físico de comercios y servicios con un panel en tiempo real. Cada soporte físico incluye una lámina con el logo del negocio, código QR y chip NFC (NTAG213). Los clientes opinan desde el navegador sin descargar ninguna app ni crear cuenta.
+Latido conecta el mostrador físico de comercios y servicios con un panel en tiempo real. Entregamos cada soporte físico llave en mano, ya configurado con el logo del negocio, código QR y chip NFC (NTAG213) listos para usar. Los clientes opinan desde el navegador sin descargar ninguna app ni crear cuenta.
 
 ## Funcionalidades Principales
 - **Ticket de opinión en 30 segundos:** calificación de 1 a 5 estrellas, aspectos personalizables por rubro y comentario opcional.
-- **Modo Rescate con reloj SLA:** cuando un cliente deja una calificación baja y decide dejar su contacto, se abre un caso prioritario con cuenta regresiva y mensajes listos para WhatsApp, Email o llamada.
+- **Modo Rescate con reloj SLA:** cuando un cliente deja una calificación baja y decide dejar su contacto, se abre un caso prioritario con cuenta regresiva, historial detallado y mensajes listos para WhatsApp, Email o llamada.
 - **Destino de reseñas flexible sin regrabar NFC ni reimprimir QR:**
   1. Solo panel privado de Latido.
-  2. Solo Google Maps (redirección directa al enlace oficial de reseñas).
+  2. Solo Google Maps (apertura directa al enlace oficial de reseñas).
   3. Ambas (primero Latido y luego invitación opcional a Google para todos por igual, respetando las políticas anti review gating de Google).
-- **Multi-sucursal y marca propia:** logo personalizado en panel, ticket y láminas QR imprimibles en alta resolución.
+- **Multi-sucursal y marca propia:** logo personalizado en panel y ticket digital, edición de sucursales y soportes físicos entregados listos con la identidad del local.
 - **Privacidad y Ley 25.326 (Argentina):** opiniones anónimas por defecto, datos de contacto desacoplados con consentimiento expreso, aislamiento multi-tenant (RLS) y purga automática a los 12 meses de resuelto el caso.
 
 ## Secciones Públicas
-- [Inicio y Planes](https://latido-opinion.vercel.app/): explicación completa, demo interactiva, planes por cantidad de soportes QR + NFC y preguntas frecuentes.
+- [Inicio y Planes](https://latido-opinion.vercel.app/): explicación completa, demo interactiva, planes mensuales por cantidad de soportes QR + NFC y preguntas frecuentes.
 - [Demo en Vivo del Ticket](https://latido-opinion.vercel.app/f/demo): prueba real del ticket de opinión sin registro.
 - [Política de Privacidad](https://latido-opinion.vercel.app/privacidad): tratamiento de datos personales conforme a la Ley 25.326.
 

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import BusinessMonogram from './BusinessMonogram';
-import { getMonogram } from '../../lib/utils';
-
-const isSafeHttpsUrl = (url) => typeof url === 'string' && /^https:\/\/\S+$/i.test(url);
+import { getMonogram, isSafeHttpsUrl } from '../../lib/utils';
 
 /**
  * Marca visual de un negocio:

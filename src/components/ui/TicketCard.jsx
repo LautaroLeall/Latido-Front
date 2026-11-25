@@ -14,9 +14,9 @@ export default function TicketCard({ children, shadow = 'teal', className = '', 
   };
 
   return (
-    <div className={`bg-paper border relative animate-fadeIn ${shadows[shadow] || shadows.teal} ${className}`}>
+    <div className={`bg-paper border relative min-w-0 animate-fadeIn ${shadows[shadow] || shadows.teal} ${className}`}>
       <PerfEdge />
-      <div className={bodyClassName}>{children}</div>
+      <div className={`min-w-0 ${bodyClassName}`}>{children}</div>
       <PerfEdge />
     </div>
   );

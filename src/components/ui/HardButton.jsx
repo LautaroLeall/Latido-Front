@@ -16,7 +16,7 @@ export default function HardButton({
   ...props
 }) {
   const sizeClasses = {
-    sm: 'min-h-[36px] px-3 text-[11px]',
+    sm: 'min-h-[38px] px-3 text-[11px]',
     md: 'min-h-[44px] px-4 text-[12.5px]'
   };
 
@@ -27,7 +27,7 @@ export default function HardButton({
     danger: 'bg-transparent text-alert-red border-alert-red hover:bg-alert-red/10'
   };
 
-  const classes = `font-mono font-bold uppercase tracking-wider border-[1.5px] rounded-none inline-flex items-center justify-center gap-2 transition-all duration-75 text-center cursor-pointer select-none disabled:opacity-45 disabled:cursor-not-allowed disabled:pointer-events-none ${sizeClasses[size] || sizeClasses.md} ${variantClasses[variant] || variantClasses.primary} ${className}`;
+  const classes = `max-w-full font-mono font-bold uppercase tracking-wider border-[1.5px] rounded-none inline-flex items-center justify-center gap-2 transition-all duration-75 text-center cursor-pointer select-none touch-manipulation disabled:opacity-45 disabled:cursor-not-allowed disabled:pointer-events-none ${sizeClasses[size] || sizeClasses.md} ${variantClasses[variant] || variantClasses.primary} ${className}`;
 
   if (as !== 'button') {
     const Component = as;

@@ -52,6 +52,38 @@ function checkLegacyAndLinks(filePath) {
         console.log(`  ✘ target="_blank" sin noopener en ${path.relative(FRONT_ROOT, filePath)}`);
       }
     }
+
+    // 3) Evitar coordenadas negativas extremas (-left-[9999px]) que rompen el ancho en iOS/Android
+    if (/-left-\[9999px\]/.test(txt)) {
+      fail++;
+      console.log(`  ✘ Coordenada negativa -left-[9999px] en ${path.relative(FRONT_ROOT, filePath)} (usar sr-only)`);
+    }
+  }
+}
+
+function checkResponsiveGuards() {
+  const cssPath = path.join(SRC_DIR, 'styles', 'index.css');
+  const css = fs.readFileSync(cssPath, 'utf8');
+  if (!css.includes('overflow-x: clip')) {
+    fail++;
+    console.log('  ✘ Falta overflow-x: clip en src/styles/index.css');
+  }
+  if (!css.includes('100dvh')) {
+    fail++;
+    console.log('  ✘ Falta min-height: 100dvh en src/styles/index.css');
+  }
+  if (!css.includes('font-size: 16px')) {
+    fail++;
+    console.log('  ✘ Falta blindaje anti-zoom iOS (font-size: 16px) en src/styles/index.css');
+  }
+  const html = fs.readFileSync(INDEX_HTML, 'utf8');
+  if (!html.includes('viewport-fit=cover')) {
+    fail++;
+    console.log('  ✘ Falta viewport-fit=cover en index.html');
+  }
+  if (/user-scalable\s*=\s*no|maximum-scale\s*=\s*1(\.0)?\b/i.test(html)) {
+    fail++;
+    console.log('  ✘ index.html no debe bloquear zoom de accesibilidad (usar font-size >= 16px en inputs)');
   }
 }
 
@@ -68,8 +100,9 @@ function walk(dir) {
 }
 
 checkEncoding(INDEX_HTML);
+checkResponsiveGuards();
 walk(SRC_DIR);
 walk(SCRIPTS_DIR);
 
-console.log(fail ? `\n✘ ${fail} problemas de higiene detectados` : '✔ Higiene Frontend OK (UTF-8 limpio, sin /registro, enlaces externos seguros)');
+console.log(fail ? `\n✘ ${fail} problemas de higiene detectados` : '✔ Higiene Frontend OK (UTF-8 limpio, responsive iOS/Android, sin /registro, enlaces externos seguros)');
 process.exit(fail ? 1 : 0);

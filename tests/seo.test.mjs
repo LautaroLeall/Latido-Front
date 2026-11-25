@@ -78,7 +78,7 @@ check('index.html tiene JSON-LD válido, canonical, OG PNG absoluto y cero handl
   assert.ok(html.includes(`content="${SITE_URL}/og-banner.png"`), 'og:image debe ser PNG absoluto HTTPS');
   assert.ok(html.includes('href="/manifest.json"'));
   assert.ok(html.includes('href="/apple-touch-icon.png"'));
-  assert.ok(html.includes('rel="preconnect" href="https://pocsdftehmjdwzvjcfcw.supabase.co"'));
+  assert.ok(html.includes('rel="preconnect" href="https://qonjvzbpfafhfciwooba.supabase.co"'));
   assert.ok(!/\son(?:load|click|error|submit)\s*=/i.test(html), 'index.html no debe usar handlers JS inline (CSP)');
 
   const ldMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);

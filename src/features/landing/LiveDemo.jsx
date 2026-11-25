@@ -8,8 +8,18 @@ import HardButton from '../../components/ui/HardButton';
 const MOODS = ['', 'Pésimo', 'Disconforme', 'Regular', 'Muy bueno', '¡Excelente!'];
 
 const SEED = [
-  { id: 's1', stars: 5, text: 'Excelente atención, volvemos seguro.', ago: 'hace 15 min' },
-  { id: 's2', stars: 4, text: 'Todo bien, faltó variedad de pastelería.', ago: 'hace 1 h' }
+  {
+    id: 's1',
+    stars: 5,
+    text: 'Excelente atención, volvemos seguro.',
+    ago: 'hace 15 min'
+  },
+  {
+    id: 's2',
+    stars: 4,
+    text: 'Todo bien, faltó variedad de pastelería.',
+    ago: 'hace 1 h'
+  }
 ];
 
 function Stars({ value, size = 30, onPick, hover, onHover }) {
@@ -163,7 +173,7 @@ export default function LiveDemo() {
                 {items.map(it => (
                   <motion.div key={it.id} layout initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
                     className={`border border-line-gray border-l-4 p-2.5 ${it.stars <= 2 ? 'border-l-alert-red' : it.stars === 3 ? 'border-l-amber' : 'border-l-teal'}`}>
-                    <div className="flex justify-between items-center gap-2">
+                    <div className="flex justify-between items-center gap-2 flex-wrap">
                       <span className="font-mono font-bold text-amber tracking-widest text-[12px]">{'★'.repeat(it.stars)}{'☆'.repeat(5 - it.stars)}
                         <span className="text-muted font-normal tracking-normal ml-2 text-[10px]">{it.ago}</span></span>
                       {it.contact ? <Stamp variant="amber">Dejó contacto</Stamp> : <Stamp variant="ink">Anónimo</Stamp>}

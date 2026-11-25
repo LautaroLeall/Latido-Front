@@ -23,11 +23,36 @@ const DestinationTab = memo(DestinationTabBase);
 const AccountTab = memo(AccountTabBase);
 
 const TABS = [
-  { id: 'resultados', label: 'Resultados', subtitle: 'Métricas y opiniones recientes en tiempo real', icon: BarChart3 },
-  { id: 'qrs', label: 'Mis QR & NFC', subtitle: 'Sucursales, láminas descargables y soportes activos', icon: QrCode },
-  { id: 'rescate', label: 'Modo Rescate', subtitle: 'Recuperá clientes insatisfechos antes de perderlos', icon: LifeBuoy },
-  { id: 'destino', label: 'Destino de reseñas', subtitle: 'Elegí qué ve el cliente al terminar de opinar', icon: ExternalLink },
-  { id: 'cuenta', label: 'Mi cuenta', subtitle: 'Plan, soportes activos, formulario del ticket y contraseña', icon: UserCog }
+  {
+    id: 'resultados',
+    label: 'Resultados',
+    subtitle: 'Métricas y opiniones recientes en tiempo real',
+    icon: BarChart3
+  },
+  {
+    id: 'qrs',
+    label: 'Mis QR & NFC',
+    subtitle: 'Tus soportes físicos QR + NFC, estado y sucursales',
+    icon: QrCode
+  },
+  {
+    id: 'rescate',
+    label: 'Modo Rescate',
+    subtitle: 'Recuperá clientes insatisfechos antes de perderlos',
+    icon: LifeBuoy
+  },
+  {
+    id: 'destino',
+    label: 'Destino de reseñas',
+    subtitle: 'Elegí qué ve el cliente al terminar de opinar',
+    icon: ExternalLink
+  },
+  {
+    id: 'cuenta',
+    label: 'Mi cuenta',
+    subtitle: 'Plan, soportes activos, formulario del ticket y contraseña',
+    icon: UserCog
+  }
 ];
 
 /**
@@ -73,9 +98,9 @@ export default function AdminDashboard() {
   const openAccount = useCallback(() => selectTab('cuenta'), [selectTab]);
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-paper-dim">
+    <div className="min-h-[100dvh] w-full max-w-full flex flex-col lg:flex-row bg-paper-dim">
       {/* ── Sidebar Escritorio / Notebook (lg+) ────────────────────────────── */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 shrink-0 bg-ink text-paper sticky top-0 h-screen border-r-2 border-ink">
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 shrink-0 bg-ink text-paper sticky top-0 h-[100dvh] border-r-2 border-ink">
         {/* Identidad del negocio */}
         <div className="p-5 border-b border-paper/15">
           <div className="flex items-center gap-3 min-w-0">
@@ -146,8 +171,8 @@ export default function AdminDashboard() {
       </aside>
 
       {/* ── Header Móvil y Tablet (<lg) ────────────────────────────────────── */}
-      <header className="lg:hidden bg-ink text-paper sticky top-0 z-40 border-b border-ink">
-        <div className="px-4 py-3 flex items-center justify-between gap-3">
+      <header className="lg:hidden bg-ink text-paper sticky top-0 z-40 border-b border-ink pt-[env(safe-area-inset-top)]">
+        <div className="px-3.5 sm:px-4 py-3 flex items-center justify-between gap-2.5">
           <div className="flex items-center gap-2.5 min-w-0">
             <BusinessLogo name={business.name} logoUrl={business.logo_url} size={36} variant="light" />
             <div className="min-w-0">
@@ -195,7 +220,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Barra de pestañas rápida (1 toque en celular y tablet) */}
-        <nav className="bg-paper-dim text-ink border-b-[1.5px] border-line-gray px-2 sm:px-4 flex gap-1 overflow-x-auto" role="tablist">
+        <nav className="bg-paper-dim text-ink border-b-[1.5px] border-line-gray px-2 sm:px-4 flex gap-1 overflow-x-auto no-scrollbar overscroll-x-contain" role="tablist">
           {TABS.map(tab => {
             const Icon = tab.icon;
             const badge = tab.id === 'rescate' ? rescue.active.length : 0;
@@ -249,14 +274,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Área de trabajo fluida */}
-        <main className="flex-1 w-full p-4 sm:p-6 lg:p-8" role="tabpanel">
+        <main className="flex-1 w-full min-w-0 p-3.5 sm:p-6 lg:p-8" role="tabpanel">
           {isAdmin && !business.logo_url && !logoPromptDismissed && activeTab !== 'cuenta' && (
             <div className="mb-6 bg-paper-dim border-[1.5px] border-ink px-4 py-3 flex flex-wrap items-center justify-between gap-3 shadow-hard-line">
               <div className="flex items-center gap-3 min-w-0">
                 <ImagePlus size={18} className="text-teal shrink-0" />
                 <p className="text-xs sm:text-sm text-ink/90 leading-snug">
-                  <strong>Personalizá tu marca:</strong> subí el logo de <strong>{business.name}</strong> para mostrarlo en el ticket,
-                  el formulario y tus láminas QR <span className="text-muted">(si no subís uno, usamos tus iniciales “{businessMonogram}”).</span>
+                  <strong>Personalizá tu marca:</strong> subí el logo de <strong>{business.name}</strong> para mostrarlo en el ticket
+                  digital, el formulario y este panel <span className="text-muted">(si no subís uno, usamos tus iniciales “{businessMonogram}”).</span>
                 </p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -279,7 +304,13 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'resultados' && (
-            <ResultsTab businessId={business.id} refreshKey={refreshKey} openCasesCount={rescue.active.length} now={now} />
+            <ResultsTab
+              business={business}
+              businessId={business.id}
+              refreshKey={refreshKey}
+              openCasesCount={rescue.active.length}
+              now={now}
+            />
           )}
           {activeTab === 'qrs' && (
             <QrTab
@@ -306,7 +337,7 @@ export default function AdminDashboard() {
         </main>
 
         {/* Footer compacto (visible en móvil/tablet; en desktop ya está en el sidebar) */}
-        <footer className="lg:hidden border-t-[1.5px] border-dashed border-line-gray px-4 py-3 flex flex-wrap justify-between items-center font-mono text-[11px] text-muted gap-2 bg-paper">
+        <footer className="lg:hidden border-t-[1.5px] border-dashed border-line-gray px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-wrap justify-between items-center font-mono text-[11px] text-muted gap-2 bg-paper">
           <div className="flex items-center gap-1.5">
             <span className={`inline-block w-2 h-2 ${live ? 'bg-teal' : 'bg-line-gray'}`} />
             {live ? 'EN VIVO' : 'CONECTANDO...'}

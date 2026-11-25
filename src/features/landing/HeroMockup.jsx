@@ -6,9 +6,21 @@ import BusinessMonogram from '../../components/branding/BusinessMonogram';
 import LatidoSymbol from '../../components/branding/LatidoSymbol';
 
 export const TOUR_STEPS = [
-  { id: 'ticket', url: 'latido.app/f/cafeteria-del-sol-…', caption: '1 · El cliente escanea y opina' },
-  { id: 'panel', url: 'latido.app/admin', caption: '2 · Te llega al instante' },
-  { id: 'rescate', url: 'latido.app/admin?tab=rescate', caption: '3 · Lo rescatás antes de que se vaya' }
+  {
+    id: 'ticket',
+    url: 'latido.app/f/cafeteria-del-sol-…',
+    caption: '1 · El cliente escanea y opina'
+  },
+  {
+    id: 'panel',
+    url: 'latido.app/admin',
+    caption: '2 · Te llega al instante'
+  },
+  {
+    id: 'rescate',
+    url: 'latido.app/admin?tab=rescate',
+    caption: '3 · Lo rescatás antes de que se vaya'
+  }
 ];
 
 function StepTicket() {
@@ -125,7 +137,7 @@ function StepRescue() {
         <div className="border border-ink p-2 text-[11px] leading-snug bg-paper-dim">
           Hola Martín, soy Sofía de Cafetería del Sol. Gracias por tu opinión; lamento que no haya estado a la altura…
         </div>
-        <div className="flex gap-2 mt-3">
+        <div className="flex flex-wrap gap-2 mt-3">
           <div className="bg-ink text-paper font-mono font-bold text-[10px] uppercase tracking-wider px-3 py-2">Abrir WhatsApp</div>
           <div className="border border-ink font-mono font-bold text-[10px] uppercase tracking-wider px-3 py-2">Descartar</div>
         </div>
@@ -162,7 +174,7 @@ export default function HeroMockup() {
     <div className="relative w-full max-w-[470px] mx-auto"
       onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-        className="bg-paper border-[1.5px] border-ink shadow-[7px_7px_0_#1F6F64] overflow-hidden">
+        className="bg-paper border-[1.5px] border-ink shadow-[4px_4px_0_#1F6F64] sm:shadow-[7px_7px_0_#1F6F64] overflow-hidden">
         {/* Barra de dirección */}
         <div className="bg-paper-dim px-3 py-2 flex items-center gap-2 border-b-[1.5px] border-ink">
           <LatidoSymbol width={20} />

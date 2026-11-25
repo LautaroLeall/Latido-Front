@@ -1,9 +1,33 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useIsPresent } from 'framer-motion';
 import { useAuth, homePathFor } from '../context/AuthContext';
 import { FullScreenLoader, FullScreenMessage } from '../components/ui/FullScreen';
 import HardButton from '../components/ui/HardButton';
 import { getErrorMessage } from '../lib/errors';
+
+/**
+ * Redirección de un solo disparo compatible con AnimatePresence:
+ * - Nunca navega si el árbol está saliendo (`!isPresent`), evitando bucles infinitos
+ *   con `<Navigate>` durante la animación de salida.
+ * - Nunca re-navega si la URL actual ya coincide con el destino o si ya disparó.
+ */
+function SafeRedirect({ to, from = null }) {
+  const isPresent = useIsPresent();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const firedToRef = useRef(null);
+
+  useEffect(() => {
+    if (!isPresent) return;
+    if (!to || location.pathname === to) return;
+    if (firedToRef.current === to) return;
+    firedToRef.current = to;
+    navigate(to, { replace: true, state: from ? { from } : undefined });
+  }, [isPresent, location.pathname, navigate, to, from]);
+
+  return null;
+}
 
 /**
  * Pantalla cuando faltan las variables de entorno de Supabase
@@ -29,12 +53,14 @@ export function ConfigMissing() {
 export default function ProtectedRoute({ roles, requireBusiness = false, children }) {
   const { configured, loading, user, profile, profileError, signOut, refreshProfile } = useAuth();
   const location = useLocation();
+  const isPresent = useIsPresent();
 
   if (!configured) return <ConfigMissing />;
   if (loading) return <FullScreenLoader label="Verificando sesión..." />;
 
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    if (!isPresent) return null;
+    return <SafeRedirect to="/login" from={location.pathname} />;
   }
 
   if (!profile) {
@@ -57,7 +83,8 @@ export default function ProtectedRoute({ roles, requireBusiness = false, childre
   }
 
   if (roles && !roles.includes(profile.role)) {
-    return <Navigate to={homePathFor(profile)} replace />;
+    if (!isPresent) return null;
+    return <SafeRedirect to={homePathFor(profile)} />;
   }
 
   if (requireBusiness && !profile.business_id) {
@@ -96,6 +123,7 @@ export default function ProtectedRoute({ roles, requireBusiness = false, childre
 export function PublicOnlyRoute({ children }) {
   const { configured, loading, user, profile, profileError, refreshProfile, signOut } = useAuth();
   const location = useLocation();
+  const isPresent = useIsPresent();
 
   if (!configured) return <ConfigMissing />;
   if (loading) return <FullScreenLoader label="Verificando sesión..." />;
@@ -118,10 +146,11 @@ export function PublicOnlyRoute({ children }) {
     );
   }
   if (user && profile) {
+    if (!isPresent) return null;
     // Volver a la página privada que se intentó abrir (el guard de esa ruta valida el rol)
     const from = location.state?.from;
     const target = from && from.startsWith('/') && !from.startsWith('//') ? from : homePathFor(profile);
-    return <Navigate to={target} replace />;
+    return <SafeRedirect to={target} />;
   }
   return children;
 }

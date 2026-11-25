@@ -99,7 +99,7 @@ export default function ResetPasswordPage() {
           <button
             type="button"
             onClick={() => setShowPass(v => !v)}
-            className="font-mono text-xs text-muted hover:text-ink underline cursor-pointer"
+            className="py-1 font-mono text-xs text-muted hover:text-ink underline cursor-pointer"
           >
             {showPass ? 'Ocultar contraseñas' : 'Mostrar contraseñas'}
           </button>

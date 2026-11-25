@@ -67,7 +67,9 @@ export default function LoginPage() {
           id="email"
           label="Email"
           type="email"
+          inputMode="email"
           autoComplete="email"
+          enterKeyHint="next"
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder="tu@negocio.com"
@@ -79,25 +81,25 @@ export default function LoginPage() {
             label="Contraseña"
             type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
+            enterKeyHint="go"
             value={password}
             onChange={e => setPassword(e.target.value)}
             placeholder="••••••••"
             required
           />
-          <button
-            type="button"
-            onClick={() => setShowPassword(v => !v)}
-            className="mt-1 font-mono text-[11px] text-muted hover:text-ink underline cursor-pointer"
-            aria-pressed={showPassword}
-          >
-            {showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-          </button>
-        </div>
-
-        <div className="text-right -mt-2">
-          <Link to="/recuperar" className="font-mono text-xs text-muted hover:text-ink underline">
-            ¿Olvidaste tu contraseña?
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-2 mt-1.5">
+            <button
+              type="button"
+              onClick={() => setShowPassword(v => !v)}
+              className="py-1 font-mono text-xs text-muted hover:text-ink underline cursor-pointer"
+              aria-pressed={showPassword}
+            >
+              {showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            </button>
+            <Link to="/recuperar" className="py-1 font-mono text-xs text-muted hover:text-ink underline">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
         </div>
 
         <Alert variant="error">{error}</Alert>

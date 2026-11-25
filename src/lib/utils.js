@@ -1,4 +1,5 @@
 import { normalizeWhatsAppDigits, validateEmail, validatePhone } from './validators.js';
+import { SITE_URL } from './seoConfig.js';
 
 /**
  * Normaliza números de teléfono al formato internacional E.164 (ej: +5493815551234)
@@ -137,11 +138,39 @@ export function formatDateTime(date) {
 }
 
 /**
- * URL pública del ticket para un token (la que se imprime en el QR y se graba en el NFC)
+ * Normaliza texto para búsquedas sin tildes ni distinción de mayúsculas
+ */
+export function normalizeSearch(str = '') {
+  return String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+/**
+ * Comprueba que una URL externa use estrictamente HTTPS sin espacios
+ */
+export function isSafeHttpsUrl(url) {
+  return typeof url === 'string' && /^https:\/\/\S+$/i.test(url);
+}
+
+/**
+ * URL base pública de la app (sin barra final)
+ */
+export function getAppBaseUrl() {
+  return (import.meta.env.VITE_APP_URL || window.location.origin).replace(/\/+$/, '');
+}
+
+/**
+ * URL pública del ticket para probar desde el entorno actual (dev o prod)
  */
 export function buildFeedbackUrl(token) {
-  const base = (import.meta.env.VITE_APP_URL || window.location.origin).replace(/\/+$/, '');
-  return `${base}/f/${token}`;
+  return `${getAppBaseUrl()}/f/${token}`;
+}
+
+/**
+ * URL canónica HTTPS de producción para imprimir QR y grabar chips NFC NTAG213.
+ * Nunca genera http://localhost incluso si el Super Admin trabaja en entorno local.
+ */
+export function buildKitUrl(token) {
+  return `${SITE_URL}/f/${token}`;
 }
 
 /**

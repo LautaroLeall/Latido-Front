@@ -5,14 +5,38 @@ import { ChevronDown } from 'lucide-react';
 import { Reveal, SectionHeader } from './landingUi';
 
 const FAQS = [
-  { q: '¿Qué es un “soporte”?', a: 'Es el kit físico que va en tu mostrador: una lámina impresa con tu logo y un QR, un soporte de acrílico y un chip NFC pegado atrás. El QR y el chip abren el mismo ticket de opinión.' },
-  { q: '¿Mis clientes tienen que instalar una app?', a: 'No. Escanean el QR con la cámara o acercan el celular al chip y se abre en el navegador, sin descargar ni registrarse.' },
-  { q: '¿Funciona en iPhone?', a: 'Sí. El QR funciona en cualquier celular. Para el chip NFC en iPhone hay que acercarlo desbloqueado a la parte de arriba del teléfono; la lámina lo indica.' },
-  { q: '¿Qué es el Modo Rescate?', a: 'Cuando un cliente deja una nota baja y sus datos, se abre un caso con cuenta regresiva y un mensaje de disculpa listo para enviar por WhatsApp o email. Después marcás si lo rescataste y Latido suma clientes recuperados y ventas estimadas.' },
-  { q: '¿Los datos de mis clientes están protegidos?', a: 'Sí. La opinión es anónima por defecto; el nombre y el contacto se guardan aparte, solo con consentimiento, y únicamente tu negocio puede verlos dentro de la plataforma. Latido no los usa para publicidad ni los comparte. Se eliminan a los 12 meses de resuelto el caso. Más en la política de privacidad.' },
-  { q: '¿Puedo usar mis soportes en varias sucursales?', a: 'Sí. Tu plan define cuántos soportes tenés y los podés usar en cualquier sucursal de tu negocio. Si abrís o cambiás de local, movés el soporte desde el panel sin regrabar el chip.' },
-  { q: '¿Cómo se paga y puedo cambiar de plan?', a: 'El pago es mensual. Podés pasar a un plan con más soportes cuando lo necesites escribiéndonos por WhatsApp; los datos y el historial no se pierden.' },
-  { q: '¿Latido me ayuda con las reseñas de Google?', a: 'Sí. Podés invitar a todos tus clientes a dejar una reseña en Google después de opinar. Lo hacemos sin filtrar por puntaje, que es lo que pide la política de Google para no sancionar tu ficha.' }
+  {
+    q: '¿Qué es un “soporte”?',
+    a: 'Es el kit físico que te entregamos listo para usar en tu mostrador: viene con tu logo, el código QR impreso y el chip NFC ya grabado y configurado por nosotros. Solo lo apoyás y empezás a recibir opiniones; desde tu panel personalizás las preguntas, el logo del formulario y el destino de las reseñas cuando quieras.'
+  },
+  {
+    q: '¿Mis clientes tienen que instalar una app?',
+    a: 'No. Escanean el QR con la cámara o acercan el celular al chip y se abre en el navegador, sin descargar ni registrarse.'
+  },
+  {
+    q: '¿Funciona en iPhone?',
+    a: 'Sí. El QR funciona en cualquier celular. Para el chip NFC en iPhone hay que acercarlo desbloqueado a la parte de arriba del teléfono; la lámina lo indica.'
+  },
+  {
+    q: '¿Qué es el Modo Rescate?',
+    a: 'Cuando un cliente deja una nota baja y sus datos, se abre un caso con cuenta regresiva y un mensaje de disculpa listo para enviar por WhatsApp o email. Después marcás si lo rescataste y Latido suma clientes recuperados y ventas estimadas.'
+  },
+  {
+    q: '¿Los datos de mis clientes están protegidos?',
+    a: 'Sí. La opinión es anónima por defecto; el nombre y el contacto se guardan aparte, solo con consentimiento, y únicamente tu negocio puede verlos dentro de la plataforma. Latido no los usa para publicidad ni los comparte. Se eliminan a los 12 meses de resuelto el caso. Más en la política de privacidad.'
+  },
+  {
+    q: '¿Puedo usar mis soportes en varias sucursales?',
+    a: 'Sí. Tu plan define cuántos soportes tenés y los podés usar en cualquier sucursal de tu negocio. Si abrís o cambiás de local, movés el soporte desde el panel sin regrabar el chip.'
+  },
+  {
+    q: '¿Cómo se paga y puedo cambiar de plan?',
+    a: 'El pago es mensual. Podés pasar a un plan con más soportes cuando lo necesites escribiéndonos por WhatsApp; los datos y el historial no se pierden.'
+  },
+  {
+    q: '¿Latido me ayuda con las reseñas de Google?',
+    a: 'Sí. Podés invitar a todos tus clientes a dejar una reseña en Google después de opinar. Lo hacemos sin filtrar por puntaje, que es lo que pide la política de Google para no sancionar tu ficha.'
+  }
 ];
 
 function FAQItem({ faq, open, onToggle }) {
@@ -41,7 +65,7 @@ export default function LandingFAQ() {
   const [openIdx, setOpenIdx] = useState(null);
 
   return (
-    <section id="faq" className="py-24 px-6 bg-paper">
+    <section id="faq" className="scroll-mt-16 py-16 sm:py-24 px-4 sm:px-6 bg-paper">
       <div className="max-w-3xl mx-auto">
         <SectionHeader tag="Preguntas frecuentes" title="Todo lo que querés saber" className="mb-12" />
         <div className="space-y-3">

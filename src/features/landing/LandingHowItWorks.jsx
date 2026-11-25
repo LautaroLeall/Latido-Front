@@ -5,14 +5,29 @@ import { Reveal, SectionHeader } from './landingUi';
 import LiveDemo from './LiveDemo';
 
 const STEPS = [
-  { n: '01', icon: Smartphone, title: 'Poné tu soporte en el mostrador', desc: 'Lámina con tu logo, soporte de acrílico y chip NFC. Una sola URL: el QR y el chip abren el mismo ticket.' },
-  { n: '02', icon: ScanLine, title: 'Tu cliente opina en 30 segundos', desc: 'Escanea o acerca el celular. Estrellas, un toque en lo que le gustó o falló y, si quiere, su contacto.' },
-  { n: '03', icon: LifeBuoy, title: 'Vos rescatás a los insatisfechos', desc: 'Si dejó su contacto con una nota baja, se abre un caso con reloj y un mensaje de disculpa listo para enviar.' }
+  {
+    n: '01',
+    icon: Smartphone,
+    title: 'Te entregamos el soporte listo para usar',
+    desc: 'Recibís tu kit físico completo con tu logo, código QR y chip NFC ya grabados y configurados. Solo lo apoyás en el mostrador.'
+  },
+  {
+    n: '02',
+    icon: ScanLine,
+    title: 'Tu cliente opina en 30 segundos',
+    desc: 'Escanea o acerca el celular. Estrellas, un toque en lo que le gustó o falló y, si quiere, su contacto.'
+  },
+  {
+    n: '03',
+    icon: LifeBuoy,
+    title: 'Vos rescatás a los insatisfechos',
+    desc: 'Si dejó su contacto con una nota baja, se abre un caso con reloj y un mensaje de disculpa listo para enviar.'
+  }
 ];
 
 export default function LandingHowItWorks() {
   return (
-    <section id="como-funciona" className="py-24 px-4 sm:px-6 bg-paper">
+    <section id="como-funciona" className="scroll-mt-16 py-24 px-4 sm:px-6 bg-paper">
       <div className="max-w-5xl mx-auto">
         <SectionHeader tag="Cómo funciona" title="Tres pasos. Sin complicaciones."
           subtitle="Nada que instalar ni integrar: ponés el soporte y empezás a recibir opiniones." className="mb-16" />
@@ -36,7 +51,7 @@ export default function LandingHowItWorks() {
         </div>
 
         <SectionHeader tag="Probalo vos" title="Opiná como si fueras el cliente"
-          subtitle="Elegí una nota. Con 1 o 2 estrellas y contacto, aparece el Modo Rescate. No se guarda nada." className="mb-10" />
+          subtitle="Elegí una nota. Con 1 o 2 estrellas y contacto, aparece el Modo Rescate." className="mb-10" />
         <Reveal><LiveDemo /></Reveal>
       </div>
     </section>

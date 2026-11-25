@@ -7,7 +7,7 @@ export default function LandingQuote() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section ref={ref} className="relative py-28 px-6 overflow-hidden bg-ink">
+    <section ref={ref} className="relative py-20 sm:py-28 px-4 sm:px-6 overflow-hidden bg-ink">
       <div className="absolute inset-0 opacity-[0.05]"
         style={{ backgroundImage: 'radial-gradient(circle, #FAF8F3 1.5px, transparent 1.5px)', backgroundSize: '34px 34px' }} />
 

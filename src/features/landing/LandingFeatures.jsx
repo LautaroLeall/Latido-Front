@@ -4,17 +4,48 @@ import { QrCode, Zap, LifeBuoy, ShieldCheck, Star, Building2 } from 'lucide-reac
 import { Reveal, SectionHeader } from './landingUi';
 
 const FEATURES = [
-  { icon: QrCode, title: 'QR y NFC con una sola URL', desc: 'El código y el chip abren el mismo ticket. Si perdés una lámina, la desactivás desde el panel y el resto sigue funcionando.', badge: null },
-  { icon: Zap, title: 'Opiniones en tiempo real', desc: 'Cada respuesta aparece en tu panel al instante, sin recargar. Promedio, distribución de estrellas y lo que más mencionan tus clientes.', badge: 'En vivo' },
-  { icon: LifeBuoy, title: 'Modo Rescate', desc: 'Nota baja + contacto = caso con reloj, mensaje de disculpa listo y contador de clientes rescatados y ventas recuperadas.', badge: 'Estrella', highlight: true },
-  { icon: ShieldCheck, title: 'Privacidad por diseño', desc: 'La opinión es anónima por defecto. El contacto se guarda aparte, solo con consentimiento, y solo lo ve tu negocio (Ley 25.326).', badge: null },
-  { icon: Star, title: 'Google, sin trampas', desc: 'Invitá a todos tus clientes a dejar una reseña en Google, sin filtrar por puntaje: cumple la política de Google y cuida tu ficha.', badge: null },
-  { icon: Building2, title: 'Todas tus sucursales', desc: 'Tus soportes se usan en cualquier sucursal de tu negocio y los podés mover cuando quieras, sin regrabar el chip.', badge: null }
+  {
+    icon: QrCode,
+    title: 'QR y NFC con una sola URL',
+    desc: 'El código y el chip abren el mismo ticket. Si perdés una lámina, la desactivás desde el panel y el resto sigue funcionando.',
+    badge: null
+  },
+  {
+    icon: Zap,
+    title: 'Opiniones en tiempo real',
+    desc: 'Cada respuesta aparece en tu panel al instante, sin recargar. Promedio, distribución de estrellas y lo que más mencionan tus clientes.',
+    badge: 'En vivo'
+  },
+  {
+    icon: LifeBuoy,
+    title: 'Modo Rescate',
+    desc: 'Nota baja + contacto = caso con reloj, mensaje de disculpa listo y contador de clientes rescatados y ventas recuperadas.',
+    badge: 'Estrella',
+    highlight: true
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Privacidad por diseño',
+    desc: 'La opinión es anónima por defecto. El contacto se guarda aparte, solo con consentimiento, y solo lo ve tu negocio (Ley 25.326).',
+    badge: null
+  },
+  {
+    icon: Star,
+    title: 'Google, sin trampas',
+    desc: 'Invitá a todos tus clientes a dejar una reseña en Google, sin filtrar por puntaje: cumple la política de Google y cuida tu ficha.',
+    badge: null
+  },
+  {
+    icon: Building2,
+    title: 'Todas tus sucursales',
+    desc: 'Tus soportes se usan en cualquier sucursal de tu negocio y los podés mover cuando quieras, sin regrabar el chip.',
+    badge: null
+  }
 ];
 
 export default function LandingFeatures() {
   return (
-    <section id="funciones" className="py-24 px-6 bg-paper-dim">
+    <section id="funciones" className="scroll-mt-16 py-16 sm:py-24 px-4 sm:px-6 bg-paper-dim">
       <div className="max-w-5xl mx-auto">
         <SectionHeader tag="Funciones" title="Todo lo que necesitás, en un solo lugar"
           subtitle="Sin integraciones ni planillas. Latido cubre desde que el cliente opina hasta que lo recuperás." />

@@ -18,7 +18,7 @@ import LandingCTA from './LandingCTA';
 export default function Landing() {
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen overflow-x-hidden">
+      <div className="min-h-[100dvh] w-full max-w-full overflow-x-clip">
         <LandingNav />
         <LandingHero />
         <LandingStats />

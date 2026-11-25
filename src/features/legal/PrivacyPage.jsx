@@ -55,15 +55,15 @@ const SECTIONS = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-paper-dim">
-      <header className="bg-paper border-b-[1.5px] border-ink">
-        <div className="max-w-3xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div className="min-h-[100dvh] bg-paper-dim">
+      <header className="bg-paper border-b-[1.5px] border-ink pt-[env(safe-area-inset-top)]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center gap-3">
           <Link to="/" aria-label="Volver al inicio"><LatidoLogo fontSize={20} symWidth={36} /></Link>
-          <Link to="/" className="font-mono text-[11px] uppercase tracking-wider text-muted hover:text-ink underline">Volver al inicio</Link>
+          <Link to="/" className="font-mono text-[11px] uppercase tracking-wider text-muted hover:text-ink underline shrink-0">Volver al inicio</Link>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-12">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-10 sm:pt-12 pb-[max(3rem,env(safe-area-inset-bottom))]">
         <span className="font-mono text-[11px] uppercase tracking-widest text-teal font-bold">Legal</span>
         <h1 className="text-3xl font-bold tracking-tight mt-1">Política de privacidad</h1>
         <p className="font-mono text-xs text-muted mt-2">Última actualización: noviembre de 2026</p>

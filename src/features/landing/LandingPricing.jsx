@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Check, MessageCircle, Mail } from 'lucide-react';
 import HardButton from '../../components/ui/HardButton';
 import { Reveal, SectionHeader } from './landingUi';
-import usePlans, { formatPlanPrice } from './usePlans';
+import usePlans from './usePlans';
 import { buildWhatsAppUrl, buildMailUrl, displayPhone, CONTACT_EMAIL } from '../../lib/contact';
 
 const INCLUDED = [
@@ -18,8 +18,7 @@ const INCLUDED = [
 ];
 
 function PlanCard({ plan, index }) {
-  const price = formatPlanPrice(plan);
-  const custom = plan.is_custom || price === null;
+  const custom = Boolean(plan.is_custom || plan.supports == null);
 
   return (
     <Reveal delay={index * 0.08} className="h-full">
@@ -34,19 +33,30 @@ function PlanCard({ plan, index }) {
 
         <h3 className="font-bold text-[18px]">{plan.name}</h3>
 
-        <div className="mt-4 mb-1 min-h-[64px]">
+        <div className="mt-4 mb-1 min-h-[68px]">
           {custom ? (
-            <div className="font-bold text-[26px] leading-tight tracking-tight">A medida</div>
+            <>
+              <div className="font-bold text-[28px] leading-tight tracking-tight">A medida</div>
+              <div className="font-mono text-[11px] font-bold text-teal uppercase tracking-wider mt-1">
+                Suscripción mensual
+              </div>
+            </>
           ) : (
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-bold text-[34px] tracking-tight tabular-nums">{price}</span>
-              <span className="font-mono text-[11px] text-muted uppercase">/ mes</span>
-            </div>
+            <>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-bold text-[32px] leading-tight tracking-tight tabular-nums">
+                  {plan.supports} {plan.supports === 1 ? 'soporte' : 'soportes'}
+                </span>
+              </div>
+              <div className="font-mono text-[11px] font-bold text-teal uppercase tracking-wider mt-1">
+                QR + NFC · Abono mensual
+              </div>
+            </>
           )}
         </div>
 
-        <div className="font-mono text-[12px] font-bold text-amber-ink uppercase tracking-wider border-t-[1.5px] border-dashed border-line-gray pt-3 mb-5">
-          {custom ? 'La cantidad de soportes que necesites' : `${plan.supports} ${plan.supports === 1 ? 'soporte' : 'soportes'} QR + NFC`}
+        <div className="font-mono text-[11.5px] font-bold text-amber-ink uppercase tracking-wider border-t-[1.5px] border-dashed border-line-gray pt-3 mb-5">
+          {custom ? 'Los soportes que necesites' : 'Kit físico configurado'}
         </div>
 
         <ul className="space-y-2 mb-7 flex-1">
@@ -59,14 +69,14 @@ function PlanCard({ plan, index }) {
 
         {custom ? (
           <HardButton as="a" variant="secondary" className="w-full" target="_blank" rel="noopener noreferrer"
-            href={buildWhatsAppUrl('Hola, quiero consultar por un plan personalizado de Latido. Necesito ___ soportes.')}>
-            <MessageCircle size={14} /> Consultar
+            href={buildWhatsAppUrl('Hola, quiero consultar por el valor mensual de un plan personalizado de Latido. Necesito ___ soportes QR + NFC.')}>
+            <MessageCircle size={14} /> Consultar valor
           </HardButton>
         ) : (
           <HardButton as="a" variant={plan.highlighted ? 'primary' : 'secondary'} className="w-full"
             target="_blank" rel="noopener noreferrer"
-            href={buildWhatsAppUrl(`Hola, quiero contratar el ${plan.name} (${plan.supports} ${plan.supports === 1 ? 'soporte' : 'soportes'}) de Latido para mi negocio.`)}>
-            <MessageCircle size={14} /> Contratar
+            href={buildWhatsAppUrl(`Hola, quiero consultar el valor mensual del ${plan.name} (${plan.supports} ${plan.supports === 1 ? 'soporte' : 'soportes'} QR + NFC) de Latido para mi negocio.`)}>
+            <MessageCircle size={14} /> Consultar valor
           </HardButton>
         )}
       </motion.div>
@@ -78,10 +88,10 @@ export default function LandingPricing() {
   const { plans } = usePlans();
 
   return (
-    <section id="planes" className="py-24 px-6 bg-paper-dim">
+    <section id="planes" className="scroll-mt-16 py-16 sm:py-24 px-4 sm:px-6 bg-paper-dim">
       <div className="max-w-6xl mx-auto">
         <SectionHeader tag="Planes" title="Todos los planes incluyen todo"
-          subtitle="La única diferencia es cuántos soportes (lámina + acrílico + chip NFC) usás. Pago mensual. Un soporte se puede usar en cualquier sucursal de tu negocio." />
+          subtitle="Modalidad mensual, sin contratos largos. La única diferencia es cuántos soportes físicos (con tu logo, QR y chip NFC ya configurados) usás. Escribinos para conocer los valores vigentes." />
 
         <div className={`grid grid-cols-1 sm:grid-cols-2 ${plans.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
           {plans.map((p, i) => <PlanCard key={p.id} plan={p} index={i} />)}

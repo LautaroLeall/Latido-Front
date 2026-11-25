@@ -21,9 +21,24 @@ function useCounter(target, duration = 1400, active = false) {
 }
 
 const STATS = [
-  { value: 30, suffix: ' s', label: 'para dejar su opinión', desc: 'Estrellas, un toque en lo que le gustó o falló, y listo. Cuanto más rápido, más clientes responden.' },
-  { value: 1, suffix: ' toque', label: 'y sin instalar nada', desc: 'Escanea el QR o acerca el celular al chip NFC. Abre en el navegador, sin apps ni registros.' },
-  { value: 60, suffix: ' min', label: 'para rescatar al cliente', desc: 'Tiempo configurable. Cada caso de Modo Rescate tiene su reloj y su mensaje listo para enviar.' }
+  {
+    value: 30,
+    suffix: ' s',
+    label: 'para dejar su opinión',
+    desc: 'Estrellas, un toque en lo que le gustó o falló, y listo. Cuanto más rápido, más clientes responden.'
+  },
+  {
+    value: 1,
+    suffix: ' toque',
+    label: 'y sin instalar nada',
+    desc: 'Escanea el QR o acerca el celular al chip NFC. Abre en el navegador, sin apps ni registros.'
+  },
+  {
+    value: 60,
+    suffix: ' min',
+    label: 'para rescatar al cliente',
+    desc: 'Tiempo configurable. Cada caso de Modo Rescate tiene su reloj y su mensaje listo para enviar.'
+  }
 ];
 
 function StatCard({ stat, index, active }) {
@@ -50,7 +65,7 @@ export default function LandingStats() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section ref={ref} className="bg-paper-dim py-24 px-6">
+    <section ref={ref} className="bg-paper-dim py-16 sm:py-24 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
         <SectionHeader tag="Por qué Latido" title="Menos fricción. Más opiniones. Más clientes que vuelven." />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

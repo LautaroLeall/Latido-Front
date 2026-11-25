@@ -7,14 +7,42 @@ import { fetchPublicTable, isPublicRpcConfigured } from '../../lib/publicRpc';
  * Super Admin y se leen de la tabla `plans`.
  */
 export const FALLBACK_PLANS = [
-  { id: 'f-base', code: 'base', name: 'Plan Base', supports: 1, price_monthly: 50000, currency: 'ARS', is_custom: false, highlighted: false },
-  { id: 'f-plus', code: 'plus', name: 'Plan Plus', supports: 3, price_monthly: 100000, currency: 'ARS', is_custom: false, highlighted: true },
-  { id: 'f-premium', code: 'premium', name: 'Plan Premium', supports: 5, price_monthly: 175000, currency: 'ARS', is_custom: false, highlighted: false },
-  { id: 'f-custom', code: 'custom', name: 'Plan Personalizado', supports: null, price_monthly: null, currency: 'ARS', is_custom: true, highlighted: false }
+  {
+    id: 'f-base',
+    code: 'base',
+    name: 'Plan Base',
+    supports: 1,
+    is_custom: false,
+    highlighted: false
+  },
+  {
+    id: 'f-plus',
+    code: 'plus',
+    name: 'Plan Plus',
+    supports: 3,
+    is_custom: false,
+    highlighted: true
+  },
+  {
+    id: 'f-premium',
+    code: 'premium',
+    name: 'Plan Premium',
+    supports: 5,
+    is_custom: false,
+    highlighted: false
+  },
+  {
+    id: 'f-custom',
+    code: 'custom',
+    name: 'Plan Personalizado',
+    supports: null,
+    is_custom: true,
+    highlighted: false
+  }
 ];
 
 const PLANS_QUERY =
-  'select=id,code,name,supports,price_monthly,currency,is_custom,highlighted&active=eq.true&order=sort_order.asc';
+  'select=id,code,name,supports,is_custom,highlighted&active=eq.true&order=sort_order.asc';
 
 /** Planes activos y públicos, ordenados como los definió el Super Admin */
 export default function usePlans() {
@@ -39,10 +67,4 @@ export default function usePlans() {
   }, []);
 
   return { plans, fromDb };
-}
-
-export function formatPlanPrice(plan) {
-  if (plan.is_custom || plan.price_monthly == null) return null;
-  const value = Math.round(Number(plan.price_monthly)).toLocaleString('es-AR');
-  return plan.currency === 'ARS' ? `$ ${value}` : `${plan.currency} ${value}`;
 }

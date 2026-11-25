@@ -150,3 +150,46 @@ Registro cronológico de avances, decisiones, fallas resueltas y tareas pendient
 - **Panel Super Admin — Diagnóstico de acompañamiento por negocio (`BusinessDetailDrawer.jsx`)**:
   - Nuevo panel lateral deslizable de solo lectura accesible desde el botón **Ver** / **Detalle** o haciendo clic sobre el nombre de cada negocio en `SuperDashboard.jsx`.
   - Consume `get_business_diagnostics(p_business_id)` (con degradación elegante si aún no se aplicó la migración 012) mostrando: diagnóstico automático de acompañamiento (_cómo ayudar hoy_ + botón de sugerencias por WhatsApp/Gmail en pestaña nueva), rendimiento y tendencia (7d, 30d vs 30d previos, distribución de estrellas, top 6 aspectos), salud del Modo Rescate (tasa, SLA, tiempo de primer contacto, ventas recuperadas), configuración actual del local, desglose por sucursal (QRs y chips NFC) y últimas 12 opiniones estrictamente anonimizadas (Ley 25.326).
+
+---
+
+## [2026-11-24] — Kits Llave en Mano, Ticket Conocer Latido, Rescate Detallado y Pulido Pre-Producción
+
+### Avances y correcciones
+
+- **Infraestructura, Vercel y Región São Paulo (`sa-east-1`)**:
+  - Migración del proyecto Supabase a South America (`qonjvzbpfafhfciwooba.supabase.co`), actualización de `preconnect` en `index.html` y pruebas `seo.test.mjs`.
+  - Fix de 404 en `/f/:token` en Vercel: removido `cleanUrls: true` de `vercel.json` y movidos los prerenderizados a `/prerender/privacidad.html` y `/prerender/f-demo.html` con fallback final `/(.*) -> /index.html`.
+  - Generado `public/favicon.ico` multi-resolución (16/32/48/64/256 px) validado automáticamente por `tests/seo.test.mjs`.
+- **Responsive móvil / iOS y Auth animado (`ViewportGuard.jsx`, `AuthShell.jsx`, `AuthSidebar.jsx`, `ProtectedRoute.jsx`)**:
+  - Blindaje móvil global (`100dvh`, `overflow-x: clip`, inputs `16px` anti-zoom en iOS, selects nativos consistentes) y `ViewportGuard` para evitar desbordes tras rotación.
+  - Pantallas `/login`, `/recuperar` y `/reset-password` rediseñadas con layout split-screen animado y transiciones direccionales.
+  - Recuperación de contraseña verificada vía RPC `check_recovery_account` antes de disparar email, con aviso claro y botón de WhatsApp si el correo no existe o el local está suspendido.
+  - Corregido bucle `Maximum update depth exceeded` al cerrar sesión o redirigir dentro de `AnimatePresence mode="wait"` reemplazando `<Navigate>` por `SafeRedirect` (con `useIsPresent()`).
+- **Ticket público — Cierre "Conocer Latido" y apertura de Google en pestaña nueva (`FeedbackView.jsx`)**:
+  - Reemplazado el botón "Enviar otra opinión" (conservado solo como reinicio discreto en `/f/demo`) por la tarjeta oscura `LatidoDiscoverCard` (**¿Qué es Latido? · Conocer Latido ↗**) que lleva a la landing.
+  - En modo `both` y modo `google` directo, el enlace de Google Maps abre en una pestaña nueva (`_blank` con `opener = null` y respaldo manual en 1 toque si el navegador bloquea el popup), dejando la pestaña original del ticket en la pantalla de confirmación **"¡Muchas gracias!"** + **Conocer Latido**.
+- **Modo Rescate — Historial detallado de casos cerrados y guía de Ventas recuperadas (`RescueTab.jsx`, `PanelBits.jsx`, `useAdminData.js`)**:
+  - Eliminado el botón visual "Eliminar datos personales (Ley 25.326)" de la interfaz de casos cerrados.
+  - Renovadas las tarjetas de historial (`HistoryCaseCard`): muestran comentario completo, aspectos, contacto, sucursal, insignia de SLA, línea de tiempo de 3 pasos (recepción, primer contacto y cierre con `resolver.full_name`), mensaje enviado expandible, filtros por resultado, motivo de descarte opcional y nota de resolución editable inline.
+  - Tarjeta **Ventas recuperadas (ESTIMADO)** aclarada: cuando el ticket promedio está en `0` ofrece acceso directo a **Ajustes** (`Configurá ticket promedio →`) y botón **`¿Qué es?`** que despliega la guía con fórmula paso a paso y ejemplo práctico (también fija junto al formulario en _Modo Rescate → Ajustes_ para no recargar la vista de casos activos).
+- **Modelo de Kits Físicos Llave en Mano (`KitsManager.jsx`, `kitPoster.js`, `BusinessDetailDrawer.jsx`, `QrTab.jsx`)**:
+  - Retiradas las instrucciones de impresión / `NFC Tools` / `NTAG213` y la descarga/visualización del código QR escaneable del panel del comercio (`QrTab`, `AccountTab`, `AdminDashboard`, `ResultsTab`) y de los textos de la landing (`LandingHowItWorks`, `LandingFAQ`): en `/admin?tab=qrs` el negocio ve la ficha de su soporte físico (sin QR descargable ni escaneable para evitar impresiones caseras fuera del kit), puede probar el ticket, mover/renombrar sucursales, desactivar por pérdida/robo y pedir soportes adicionales por WhatsApp.
+  - Nueva pestaña **Kits y NFC** en `/super` (`KitsManager.jsx`) conectada a la migración `015`: lista global de soportes, filtros por estado de entrega, alta de nuevos kits (`super_create_kit`), copia de URL HTTPS canónica (`buildKitUrl` / `SITE_URL`, nunca `localhost`) para chip NTAG213, notas internas, marcado de entrega y descarga exclusiva de **Lámina HD imprimible (1200×1800 px, proporción 2:3 para acrílico 10×15 cm a ~305 dpi)** generada en Canvas 2D (`src/lib/kitPoster.js`) con precarga de fuentes (`document.fonts.load`), márgenes seguros de 5,5 mm, textos ≥ 7 pt (≥ 30 px), zona objetivo NFC (_← Acercá tu celular acá_), mensaje único (_Tu opinión en pocos segundos_) y símbolo oficial 52×36 unificado con `LatidoSymbol.jsx` y `latido-simbolo.svg`.
+  - Subida/eliminación de logo del negocio habilitada también para Super Admin desde `BusinessDetailDrawer.jsx` (respaldado por migración `014`).
+- **Renombrado inline de sucursales (`BranchNameEditor.jsx`)**:
+  - Tanto el Admin del comercio (`QrTab.jsx`) como el Super Admin (`BusinessDetailDrawer.jsx` y `KitsManager.jsx`) pueden editar el nombre de cualquier sucursal inline con validación de 2–60 caracteres (respaldado por migración `016`).
+- **Landing pública — Navegación móvil corregida y planes sin montos (`LandingNav.jsx`, `landingUi.jsx`, `LandingPricing.jsx`, `usePlans.js`)**:
+  - Corregidos los 4 botones del menú móvil (_Cómo funciona_, _Funciones_, _Planes_, _Preguntas_) difiriendo el scroll compensado por navbar al `onExitComplete` del menú desplegable y agregando `scroll-mt-16` en las secciones.
+  - Ocultados los precios numéricos en la landing pública (`LandingPricing` y consulta pública de `usePlans`): se muestran la modalidad **Suscripción mensual**, la cantidad de soportes físicos incluidos, todos los beneficios y el botón **Consultar valor** por WhatsApp.
+- **Contacto visible en todas las calificaciones (`ResultsTab.jsx`, `useAdminData.js`)**:
+  - `useRecentResponses` ahora trae también `email` y `phone` de `response_contacts` para cualquier calificación (1★ a 5★, no solo Modo Rescate).
+  - En **Resultados**, cada opinión donde el cliente dejó contacto muestra nombre, teléfono, email, canal preferido y botones directos (WhatsApp, Gmail, Email y Llamada en pestaña nueva) con mensaje prearmado según el puntaje (agradecimiento en 4–5★, seguimiento en 3★, disculpa en 1–2★), además de filtro rápido `Con contacto`.
+- **Refactor modular de `src/features/` (cero archivos > 370 líneas)**:
+  - Divididos los 8 módulos extensos (500–1067 líneas) más `QrTab` y `ResultsTab` en subcomponentes, hooks y helpers cohesivos sin cambiar rutas públicas ni contratos:
+    - `features/feedback/`: `FeedbackView` + `useFeedbackTicket`, `FeedbackStates`, `ContactSection`, `LatidoDiscoverCard` (aislamiento liviano intacto: `FeedbackView` en ~7.4 KB gzip).
+    - `features/admin/tabs/`: `rescue/` (6 módulos), `account/` (5 módulos), `survey/` (`useSurveyEditor` + `SurveyTicketPreview`), `QrCard` y `ResponseCard`.
+    - `features/super/`: `detail/` (8 módulos), `kits/` (3 módulos), `create/` (2 módulos) y `dashboard/` (`useSuperData`, `SuperShell`, `BusinessCardList` unificando móvil y escritorio en tarjetas limpias sin colisiones ni scroll horizontal).
+- **Limpieza de código**:
+  - Centralizadas `normalizeSearch`, `isSafeHttpsUrl` y `getAppBaseUrl` en `src/lib/utils.js` (0 utilidades duplicadas).
+  - Conservados los 6 SVGs de marca en `public/` por solicitud expresa como recursos de identidad.

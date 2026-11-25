@@ -15,7 +15,7 @@ const PILLS = ['QR + chip NFC', 'Tiempo real', 'Modo Rescate'];
 
 export default function LandingHero() {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-ink">
+    <section className="relative min-h-[100dvh] flex items-center overflow-hidden bg-ink">
       {/* Retícula de fondo */}
       <div className="absolute inset-0 opacity-[0.07]"
         style={{
@@ -28,33 +28,33 @@ export default function LandingHero() {
           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2.4, ease: 'easeInOut' }} />
       </svg>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-24 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center w-full">
-        <div>
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-16 sm:pb-24 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center w-full">
+        <div className="min-w-0">
           <motion.span {...fadeUp(0.1)}
-            className="inline-block font-mono font-bold text-[11px] uppercase tracking-widest text-amber border-[1.5px] border-amber px-3 py-1 -rotate-1 mb-6">
+            className="inline-block font-mono font-bold text-[10.5px] sm:text-[11px] uppercase tracking-widest text-amber border-[1.5px] border-amber px-2.5 sm:px-3 py-1 -rotate-1 mb-5 sm:mb-6 max-w-full">
             Feedback · QR · NFC · Modo Rescate
           </motion.span>
 
-          <motion.h1 {...fadeUp(0.2)} className="font-bold text-paper leading-[1.08] tracking-tight mb-6"
-            style={{ fontSize: 'clamp(2.4rem, 5vw, 3.9rem)' }}>
+          <motion.h1 {...fadeUp(0.2)} className="font-bold text-paper leading-[1.08] tracking-tight mb-5 sm:mb-6"
+            style={{ fontSize: 'clamp(2rem, 8vw, 3.9rem)' }}>
             Cada opinión,{' '}<span className="text-amber">a tiempo.</span>
           </motion.h1>
 
-          <motion.p {...fadeUp(0.32)} className="text-paper/75 text-[17px] leading-relaxed mb-9 max-w-lg">
+          <motion.p {...fadeUp(0.32)} className="text-paper/75 text-base sm:text-[17px] leading-relaxed mb-7 sm:mb-9 max-w-lg">
             Tus clientes opinan en 30 segundos escaneando un QR o acercando el celular. Vos te enterás al instante
             y rescatás al que se fue enojado <strong className="text-paper">antes de perderlo para siempre</strong>.
           </motion.p>
 
-          <motion.div {...fadeUp(0.44)} className="flex flex-wrap gap-4 mb-10">
-            <button type="button" onClick={() => scrollToSection('planes')}>
+          <motion.div {...fadeUp(0.44)} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-8 sm:mb-10">
+            <button type="button" onClick={() => scrollToSection('planes')} className="w-full sm:w-auto">
               <motion.span whileHover={{ x: -1, y: -1 }} whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 bg-paper text-ink font-mono font-bold uppercase tracking-wider text-[12.5px] px-6 min-h-[48px] border-[1.5px] border-paper shadow-[4px_4px_0_#C89B3C] cursor-pointer">
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-paper text-ink font-mono font-bold uppercase tracking-wider text-[12.5px] px-6 min-h-[48px] border-[1.5px] border-paper shadow-[4px_4px_0_#C89B3C] cursor-pointer">
                 Ver planes <ArrowRight size={15} />
               </motion.span>
             </button>
-            <Link to="/f/demo">
+            <Link to="/f/demo" className="w-full sm:w-auto">
               <motion.span whileHover={{ x: -1, y: -1 }} whileTap={{ scale: 0.97 }}
-                className="inline-flex items-center gap-2 text-paper font-mono font-bold uppercase tracking-wider text-[12.5px] px-6 min-h-[48px] border-[1.5px] border-paper/40 hover:bg-paper/10 cursor-pointer">
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-paper font-mono font-bold uppercase tracking-wider text-[12.5px] px-6 min-h-[48px] border-[1.5px] border-paper/40 hover:bg-paper/10 cursor-pointer">
                 <Play size={13} className="fill-paper" /> Probar el ticket
               </motion.span>
             </Link>
@@ -69,13 +69,13 @@ export default function LandingHero() {
           </motion.ul>
         </div>
 
-        <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}>
+        <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }} className="min-w-0">
           <HeroMockup />
         </motion.div>
       </div>
 
       <button type="button" onClick={() => scrollToSection('como-funciona')} aria-label="Bajar"
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-widest text-paper/40 hover:text-paper/80 cursor-pointer">
+        className="hidden sm:block absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-widest text-paper/40 hover:text-paper/80 cursor-pointer">
         ↓ cómo funciona
       </button>
 

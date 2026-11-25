@@ -1,13 +1,21 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 
-/** Scroll suave a una sección por id (null = volver arriba) */
+/** Scroll suave a una sección por id compensando el navbar fijo (null = volver arriba) */
 export function scrollToSection(id) {
+  const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const behavior = reduce ? 'auto' : 'smooth';
   if (!id) {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior });
     return;
   }
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const el = document.getElementById(id);
+  if (!el) return;
+  const nav = document.querySelector('nav');
+  const rawNavH = nav ? nav.getBoundingClientRect().height : 68;
+  const offset = Math.min(Math.max(rawNavH, 56), 84);
+  const top = Math.max(0, Math.round(el.getBoundingClientRect().top + window.scrollY - offset));
+  window.scrollTo({ top, behavior });
 }
 
 /** Entrada suave al aparecer en pantalla (una sola vez) */
